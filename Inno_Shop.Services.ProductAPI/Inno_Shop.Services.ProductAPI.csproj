@@ -21,8 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ProductAPI.Core\ProductAPI.Application\Services\" />
-    <Folder Include="ProductAPI.Core\ProductAPI.Application\Interfaces\" />
     <Folder Include="ProductAPI.Presentation\Controllers\" />
     <Folder Include="ProductAPI.Presentation\Extensions\" />
   </ItemGroup>
