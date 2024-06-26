@@ -2,7 +2,18 @@
 
 namespace Inno_Shop.Services.ProductAPI.Models.DataTransferObjects;
 
-public record ProductDto
+public class ProductDto
+{
+	public int ProductId { get; set; }
+	public string? Name { get; set; }
+	public string? Description { get; set; }
+	public double? Price { get; set; }
+	public string? CategoryName { get; set; }
+	public DateTime CreationDate { get; set; }
+	public string? ImageUrl { get; set; }
+}
+
+public record ProductForManipulationDto
 {
 	public int ProductId { get; set; }
 	public string? Name { get; set; }
@@ -15,5 +26,5 @@ public record ProductDto
 	public string? ImageUrl { get; set; }
 }
 
-public record ProductForUpdateDto : ProductDto;
-public record ProductForCreationDto : ProductDto;
+public record ProductForUpdateDto : ProductForManipulationDto;
+public record ProductForCreationDto : ProductForManipulationDto;
