@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using AutoMapper;
 using Inno_Shop.Services.ProductAPI.ProductAPI.Presentation;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Inno_Shop.Services.ProductAPI.ProductAPI.Core.ProductAPI.Application.Interfaces;
+using Inno_Shop.Services.ProductAPI.ProductAPI.Core.ProductAPI.Application.Services;
+using Inno_Shop.Services.ProductAPI.Repository;
 
 namespace Inno_Shop.Services.ProductAPI;
 
@@ -39,9 +43,9 @@ public class Program
 		services.AddDbContext<AppDbContext>(op =>
 			op.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-		IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
-		services.AddSingleton(mapper);
-		services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+		services.TryAddScoped<IProductRepository, ProductRepository>();
+		services.TryAddScoped<IProductService, ProductService>();
+		services.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
 	}
 
 	public static void ConfigureApp(IApplicationBuilder app)
