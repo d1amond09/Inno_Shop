@@ -1,13 +1,10 @@
-using Microsoft.Extensions.Configuration;
-using Inno_Shop.Services.ProductAPI.DbContexts;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.HttpOverrides;
-using AutoMapper;
-using Inno_Shop.Services.ProductAPI.ProductAPI.Presentation;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Inno_Shop.Services.ProductAPI.ProductAPI.Core.ProductAPI.Application.Interfaces;
-using Inno_Shop.Services.ProductAPI.ProductAPI.Core.ProductAPI.Application.Services;
+using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
+using Inno_Shop.Services.ProductAPI.Core.Application.Service;
+using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
+using Inno_Shop.Services.ProductAPI.Presentation;
 using Inno_Shop.Services.ProductAPI.Repository;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Inno_Shop.Services.ProductAPI;
 
@@ -18,7 +15,7 @@ public class Program
 		var builder = WebApplication.CreateBuilder(args);
 
 		ConfigureServices(builder.Services, builder.Configuration);
-		
+
 		var app = builder.Build();
 
 		if (app.Environment.IsDevelopment())

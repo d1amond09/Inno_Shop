@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ProductAPI.Presentation\Extensions\" />
+    <Folder Include="Presentation\Extensions\" />
   </ItemGroup>
 
 </Project>

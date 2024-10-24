@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Inno_Shop.Services.ProductAPI.Models.DataTransferObjects;
-using Inno_Shop.Services.ProductAPI.ProductAPI.Core.ProductAPI.Application.Interfaces;
+using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
+using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
 
-namespace Inno_Shop.Services.ProductAPI.ProductAPI.Core.ProductAPI.Application.Services;
+namespace Inno_Shop.Services.ProductAPI.Core.Application.Service;
 
 public class ProductService(IProductRepository rep, IMapper mapper) : IProductService
 {

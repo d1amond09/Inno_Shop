@@ -1,8 +1,7 @@
-﻿using Inno_Shop.Services.ProductAPI.ProductAPI.Core.ProductAPI.Application.Interfaces;
-using Microsoft.AspNetCore.Http;
+﻿using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Inno_Shop.Services.ProductAPI.ProductAPI.Presentation.Controllers;
+namespace Inno_Shop.Services.ProductAPI.Presentation.Controllers;
 
 [Route("api/products")]
 [ApiController]

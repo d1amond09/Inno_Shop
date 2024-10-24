@@ -1,9 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Inno_Shop.Services.ProductAPI.DbContexts;
 using Inno_Shop.Services.ProductAPI.ProductAPI.Core.ProductAPI.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Inno_Shop.Services.ProductAPI.ProductAPI.Infastructure.Persistence.Repository;
+namespace Inno_Shop.Services.ProductAPI.Infastructure.Persistence.Repository;
 
 public abstract class RepositoryBase<T>(AppDbContext db) : IRepositoryBase<T> where T : class
 {

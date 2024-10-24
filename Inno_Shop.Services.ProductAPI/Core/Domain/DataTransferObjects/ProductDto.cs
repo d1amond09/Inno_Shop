@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Inno_Shop.Services.ProductAPI.Models.DataTransferObjects;
+namespace Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
 
 public record ProductDto
 {
