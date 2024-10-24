@@ -12,15 +12,9 @@ public class ProductController(IProductService service) : ControllerBase
 	[HttpGet]
 	public async Task<IActionResult> GetProducts()
 	{
-		try
-		{
-			var products = await _service.GetProducts(trackChanges: false);
-			return Ok(products);
-		}
-		catch
-		{
-			return StatusCode(500, "Internal server error");
-		}
+		throw new Exception("Exception");
+		var products = await _service.GetProducts(trackChanges: false);
+		return Ok(products);
 	}
 
 }

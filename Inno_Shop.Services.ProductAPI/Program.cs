@@ -2,7 +2,9 @@ using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 using Inno_Shop.Services.ProductAPI.Core.Application.Service;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
 using Inno_Shop.Services.ProductAPI.Presentation;
+using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 using Inno_Shop.Services.ProductAPI.Repository;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -17,12 +19,9 @@ public class Program
 		ConfigureServices(builder.Services, builder.Configuration);
 
 		var app = builder.Build();
-
-		if (app.Environment.IsDevelopment())
-		{
-			app.UseSwagger();
-			app.UseSwaggerUI();
-		}
+		app.ConfigureExceptionHandler();
+		if (app.Environment.IsProduction())
+			app.UseHsts();
 
 		ConfigureApp(app);
 
@@ -48,6 +47,12 @@ public class Program
 	public static void ConfigureApp(IApplicationBuilder app)
 	{
 		app.UseHttpsRedirection();
+		app.UseStaticFiles();
+		app.UseForwardedHeaders(new ForwardedHeadersOptions
+		{
+			ForwardedHeaders = ForwardedHeaders.All
+		});
+		app.UseCors("CorsPolicy");
 		app.UseAuthorization();
 	}
 }
