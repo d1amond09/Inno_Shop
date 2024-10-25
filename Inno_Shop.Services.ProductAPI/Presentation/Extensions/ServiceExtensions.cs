@@ -1,8 +1,10 @@
-﻿using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
+﻿using Inno_Shop.Services.ProductAPI.Core.Application;
+using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 using Inno_Shop.Services.ProductAPI.Core.Application.Service;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
 using Inno_Shop.Services.ProductAPI.Repository;
 using Microsoft.EntityFrameworkCore;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 
@@ -34,4 +36,8 @@ public static class ServiceExtensions
 
 	public static void ConfigureAutoMapper(this IServiceCollection services) =>
 		services.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
+
+	public static void ConfigureMediatR(this IServiceCollection services) =>
+		services.AddMediatR(cfg => 
+			cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly));
 }

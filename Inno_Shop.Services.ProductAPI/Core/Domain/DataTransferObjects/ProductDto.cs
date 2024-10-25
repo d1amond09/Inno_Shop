@@ -4,7 +4,7 @@ namespace Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
 
 public record ProductDto
 {
-	public Guid Id { get; init; }
+	public Guid ProductID { get; init; }
 	public string? Name { get; init; }
 	public string? Description { get; init; }
 	public double? Price { get; init; }
@@ -16,7 +16,6 @@ public record ProductDto
 
 public record ProductForManipulationDto
 {
-	public int ProductId { get; init; }
 	public string? Name { get; init; }
 	public string? Description { get; init; }
 

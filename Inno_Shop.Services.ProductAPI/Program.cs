@@ -39,6 +39,7 @@ public class Program
 		s.ConfigureProductService();
 		s.ConfigureSqlContext(c);
 		s.ConfigureAutoMapper();
+		s.ConfigureMediatR();
 
 		s.Configure<ApiBehaviorOptions>(options =>
 		{

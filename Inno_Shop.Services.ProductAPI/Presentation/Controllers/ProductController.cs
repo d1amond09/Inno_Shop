@@ -3,19 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
 using Inno_Shop.Services.ProductAPI.Core.Domain.Responses;
 using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
+using MediatR;
+using Inno_Shop.Services.ProductAPI.Core.Application.Queries;
+using Inno_Shop.Services.ProductAPI.Core.Application.Commands;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Controllers;
 
 [Route("api/products")]
 [ApiController]
-public class ProductController(IProductService service) : ApiControllerBase
+public class ProductController(ISender sender) : ApiControllerBase
 {
-	private readonly IProductService _service = service;
+	private readonly ISender _sender = sender;
 
 	[HttpGet]
 	public async Task<IActionResult> GetProducts()
 	{
-		var baseResult = await _service.GetProductsAsync(trackChanges: false);
+		var baseResult = await _sender.Send(new GetProductsQuery(TrackChanges: false));
 		var products = baseResult.GetResult<IEnumerable<ProductDto>>();
 		return Ok(products);
 
@@ -24,12 +27,13 @@ public class ProductController(IProductService service) : ApiControllerBase
 	[HttpGet("{id:guid}", Name = "ProductById")]
 	public async Task<IActionResult> GetProduct(Guid id)
 	{
-		var baseResult = await _service.GetProductByIdAsync(id, trackChanges: false);
+		var baseResult = await _sender.Send(new GetProductQuery(id, TrackChanges: false));
+
 		if (!baseResult.Success)
 			return ProcessError(baseResult);
 
-		var company = baseResult.GetResult<ProductDto>();
-		return Ok(company);
+		var products = baseResult.GetResult<ProductDto>();
+		return Ok(products);
 	}
 
 	[HttpPost]
@@ -40,16 +44,16 @@ public class ProductController(IProductService service) : ApiControllerBase
 
 		if (!ModelState.IsValid)
 			return UnprocessableEntity(ModelState);
+		
+		var createdProduct = await _sender.Send(new CreateProductCommand(product));
 
-		var createdProduct = await _service.CreateProductAsync(product);
-
-		return CreatedAtRoute("ProductById", new { id = createdProduct.Id }, createdProduct);
+		return CreatedAtRoute("ProductById", new { id = createdProduct.ProductID }, createdProduct);
 	}
 
 	[HttpDelete("{id:guid}")]
 	public async Task<IActionResult> DeleteProduct(Guid id)
 	{
-		await _service.DeleteProductAsync(id, trackChanges: false);
+		await _sender.Send(new DeleteProductCommand(id, TrackChanges: false));
 
 		return NoContent();
 	}
@@ -60,7 +64,7 @@ public class ProductController(IProductService service) : ApiControllerBase
 		if (product is null)
 			return BadRequest("ProductForUpdateDto object is null");
 
-		await _service.UpdateProductAsync(id, product, trackChanges: true);
+		await _sender.Send(new UpdateProductCommand(id, product, TrackChanges: true));
 
 		return NoContent();
 	}
