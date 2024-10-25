@@ -31,4 +31,7 @@ public static class ServiceExtensions
 
 	public static void ConfigureProductService(this IServiceCollection services) =>
 		services.AddScoped<IProductService, ProductService>();
+
+	public static void ConfigureAutoMapper(this IServiceCollection services) =>
+		services.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
 }

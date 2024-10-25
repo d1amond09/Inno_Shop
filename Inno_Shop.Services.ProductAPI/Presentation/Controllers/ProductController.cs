@@ -12,8 +12,7 @@ public class ProductController(IProductService service) : ControllerBase
 	[HttpGet]
 	public async Task<IActionResult> GetProducts()
 	{
-		var products = await _service.GetProducts(trackChanges: false);
+		var products = await _service.GetProductsAsync(trackChanges: false);
 		return Ok(products);
 	}
-
 }

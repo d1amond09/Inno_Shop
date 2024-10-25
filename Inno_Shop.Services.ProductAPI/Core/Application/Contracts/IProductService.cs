@@ -1,8 +1,13 @@
 ﻿using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
+using Inno_Shop.Services.ProductAPI.Domain.Models;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 
 public interface IProductService
 {
-	public Task<IEnumerable<ProductDto>> GetProducts(bool trackChanges);
+	Task<IEnumerable<ProductDto>> GetProductsAsync(bool trackChanges);
+	Task<ProductDto> GetProductByIdAsync(Guid productId, bool trackChanges);
+	Task<ProductDto> CreateProductAsync(ProductForCreationDto product);
+	Task DeleteProductAsync(Guid productId, bool trackChanges);
+	Task UpdateCompanyAsync(Guid productId, ProductForUpdateDto productForUpdate, bool trackChanges);
 }

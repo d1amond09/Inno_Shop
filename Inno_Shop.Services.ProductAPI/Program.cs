@@ -32,27 +32,27 @@ public class Program
 
 	public static void ConfigureServices(IServiceCollection s, IConfiguration c)
 	{
-		s.AddControllers();
-
-		s.AddEndpointsApiExplorer();
-		s.AddSwaggerGen();
-
-		s.ConfigureSqlContext(c);
-
+		s.ConfigureCors();
 		s.ConfigureProductRepository();
 		s.ConfigureProductService();
-		s.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
+		s.ConfigureSqlContext(c);
+		s.ConfigureAutoMapper();
+		s.AddControllers(config =>
+		{
+			config.RespectBrowserAcceptHeader = true;
+			config.ReturnHttpNotAcceptable = true;
+		});
 	}
 
 	public static void ConfigureApp(IApplicationBuilder app)
 	{
+		app.UseCors("CorsPolicy");
 		app.UseHttpsRedirection();
 		app.UseStaticFiles();
 		app.UseForwardedHeaders(new ForwardedHeadersOptions
 		{
 			ForwardedHeaders = ForwardedHeaders.All
 		});
-		app.UseCors("CorsPolicy");
 		app.UseAuthorization();
 	}
 }
