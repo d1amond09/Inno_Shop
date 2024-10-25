@@ -5,8 +5,10 @@ using Inno_Shop.Services.ProductAPI.Presentation;
 using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 using Inno_Shop.Services.ProductAPI.Repository;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Inno_Shop.Services.ProductAPI;
 
@@ -37,6 +39,12 @@ public class Program
 		s.ConfigureProductService();
 		s.ConfigureSqlContext(c);
 		s.ConfigureAutoMapper();
+
+		s.Configure<ApiBehaviorOptions>(options =>
+		{
+			options.SuppressModelStateInvalidFilter = true;
+		});
+
 		s.AddControllers(config =>
 		{
 			config.RespectBrowserAcceptHeader = true;

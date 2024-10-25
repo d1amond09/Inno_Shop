@@ -2,8 +2,10 @@
 using AutoMapper;
 using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 using Inno_Shop.Services.ProductAPI.Core.Domain.Exceptions;
+using Inno_Shop.Services.ProductAPI.Core.Domain.Responses;
 using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
 using Inno_Shop.Services.ProductAPI.Domain.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Service;
 
@@ -40,18 +42,21 @@ public class ProductService(IProductRepository rep, IMapper mapper) : IProductSe
 		await _rep.SaveAsync();
 	}
 
-	public async Task<ProductDto> GetProductByIdAsync(Guid productId, bool trackChanges)
+	public async Task<ApiBaseResponse> GetProductByIdAsync(Guid productId, bool trackChanges)
 	{
 		var product = await _rep.GetProductByIdAsync(productId, trackChanges);
+		if (product is null)
+			return new ProductNotFoundResponse(productId);
+
 		var productDto = _mapper.Map<ProductDto>(product);
-		return productDto;
+		return new ApiOkResponse<ProductDto>(productDto);
 	}
 
-	public async Task<IEnumerable<ProductDto>> GetProductsAsync(bool trackChanges)
+	public async Task<ApiBaseResponse> GetProductsAsync(bool trackChanges)
 	{
 		var products = await _rep.GetProductsAsync(trackChanges);
 		var productsDto = _mapper.Map<IEnumerable<ProductDto>>(products);
-		return productsDto;
+		return new ApiOkResponse<IEnumerable<ProductDto>>(productsDto);
 	}
 
 }

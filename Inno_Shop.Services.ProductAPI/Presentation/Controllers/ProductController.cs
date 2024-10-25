@@ -1,27 +1,35 @@
 ﻿using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
+using Inno_Shop.Services.ProductAPI.Core.Domain.Responses;
+using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Controllers;
 
 [Route("api/products")]
 [ApiController]
-public class ProductController(IProductService service) : ControllerBase
+public class ProductController(IProductService service) : ApiControllerBase
 {
 	private readonly IProductService _service = service;
 
 	[HttpGet]
 	public async Task<IActionResult> GetProducts()
 	{
-		var products = await _service.GetProductsAsync(trackChanges: false);
+		var baseResult = await _service.GetProductsAsync(trackChanges: false);
+		var products = baseResult.GetResult<IEnumerable<ProductDto>>();
 		return Ok(products);
+
 	}
 
 	[HttpGet("{id:guid}", Name = "ProductById")]
 	public async Task<IActionResult> GetProduct(Guid id)
 	{
-		var product = await _service.GetProductByIdAsync(id, trackChanges: false);
-		return Ok(product);
+		var baseResult = await _service.GetProductByIdAsync(id, trackChanges: false);
+		if (!baseResult.Success)
+			return ProcessError(baseResult);
+
+		var company = baseResult.GetResult<ProductDto>();
+		return Ok(company);
 	}
 
 	[HttpPost]
