@@ -36,8 +36,9 @@ public class Program
 		s.ConfigureCors();
 		s.ConfigureProductRepository();
 		s.ConfigureSqlContext(c);
+		s.ConfigureMediatR(); 
 		s.ConfigureAutoMapper();
-		s.ConfigureMediatR();
+		s.ConfigureFluentValidation();
 
 		s.Configure<ApiBehaviorOptions>(options =>
 		{

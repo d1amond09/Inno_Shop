@@ -2,6 +2,7 @@
 using Inno_Shop.Services.ProductAPI.Core.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
+using System.Text.Json;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 
@@ -22,14 +23,26 @@ public static class ExceptionMiddlewareExtensions
 					{
 						NotFoundException => StatusCodes.Status404NotFound,
 						BadRequestException => StatusCodes.Status400BadRequest,
+						ValidationAppException => StatusCodes.Status422UnprocessableEntity,
 						_ => StatusCodes.Status500InternalServerError
 					};
 
-					await context.Response.WriteAsync(new ErrorDetails()
+					if (contextFeature.Error is ValidationAppException exception)
 					{
-						StatusCode = context.Response.StatusCode,
-						Message = contextFeature.Error.Message,
-					}.ToString());
+						await context.Response
+					   .WriteAsync(JsonSerializer.Serialize(new
+					   {
+						   exception.Errors
+					   }));
+					}
+					else
+					{
+						await context.Response.WriteAsync(new ErrorDetails()
+						{
+							StatusCode = context.Response.StatusCode,
+							Message = contextFeature.Error.Message,
+						}.ToString());
+					}
 				}
 			});
 		});
