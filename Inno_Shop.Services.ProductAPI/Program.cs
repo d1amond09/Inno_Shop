@@ -1,5 +1,4 @@
 using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
-using Inno_Shop.Services.ProductAPI.Core.Application.Service;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
 using Inno_Shop.Services.ProductAPI.Presentation;
 using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
@@ -36,7 +35,6 @@ public class Program
 	{
 		s.ConfigureCors();
 		s.ConfigureProductRepository();
-		s.ConfigureProductService();
 		s.ConfigureSqlContext(c);
 		s.ConfigureAutoMapper();
 		s.ConfigureMediatR();
