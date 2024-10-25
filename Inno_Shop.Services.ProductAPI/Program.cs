@@ -1,3 +1,4 @@
+//using Hellang.Middleware.ProblemDetails;
 using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
 using Inno_Shop.Services.ProductAPI.Presentation;
@@ -16,11 +17,10 @@ public class Program
 	public static void Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
-
 		ConfigureServices(builder.Services, builder.Configuration);
 
 		var app = builder.Build();
-		app.ConfigureExceptionHandler();
+
 		if (app.Environment.IsProduction())
 			app.UseHsts();
 
@@ -30,9 +30,11 @@ public class Program
 
 		app.Run();
 	}
-
+	 
 	public static void ConfigureServices(IServiceCollection s, IConfiguration c)
 	{
+		s.ConfigureExceptionHandler();
+		s.AddProblemDetails();
 		s.ConfigureCors();
 		s.ConfigureProductRepository();
 		s.ConfigureSqlContext(c);
@@ -54,6 +56,7 @@ public class Program
 
 	public static void ConfigureApp(IApplicationBuilder app)
 	{
+		app.UseExceptionHandler(opt => { });
 		app.UseCors("CorsPolicy");
 		app.UseHttpsRedirection();
 		app.UseStaticFiles();

@@ -3,10 +3,10 @@ using Inno_Shop.Services.ProductAPI.Core.Application;
 using Inno_Shop.Services.ProductAPI.Core.Application.Behaviors;
 using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
+using Inno_Shop.Services.ProductAPI.Presentation.GlobalException;
 using Inno_Shop.Services.ProductAPI.Repository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 
@@ -47,4 +47,6 @@ public static class ServiceExtensions
 		services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly);
 	}
 
+	public static void ConfigureExceptionHandler(this IServiceCollection services) =>
+		services.AddExceptionHandler<GlobalExceptionHandler>();
 }
