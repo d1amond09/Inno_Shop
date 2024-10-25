@@ -31,7 +31,7 @@ public class ProductService(IProductRepository rep, IMapper mapper) : IProductSe
 		_rep.DeleteProduct(product);
 		await _rep.SaveAsync();
 	}
-	public async Task UpdateCompanyAsync(Guid productId, ProductForUpdateDto productForUpdate, bool trackChanges)
+	public async Task UpdateProductAsync(Guid productId, ProductForUpdateDto productForUpdate, bool trackChanges)
 	{
 		var productEntity = await _rep.GetProductByIdAsync(productId, trackChanges) 
 			?? throw new ProductNotFoundException(productId);
