@@ -11,16 +11,8 @@ public class ProductService(IProductRepository rep, IMapper mapper) : IProductSe
 
 	public async Task<IEnumerable<ProductDto>> GetProducts(bool trackChanges)
 	{
-		try
-		{
-			var products = await _rep.GetProducts(trackChanges);
-			var productsDto = _mapper.Map<IEnumerable<ProductDto>>(products);
-			return productsDto;
-		}
-		catch (Exception ex)
-		{
-			//_logger.LogError($"Something went wrong in the { nameof(GetProducts)} service method {ex}");
-			throw;
-		}
+		var products = await _rep.GetProducts(trackChanges);
+		var productsDto = _mapper.Map<IEnumerable<ProductDto>>(products);
+		return productsDto;
 	}
 }

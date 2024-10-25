@@ -4,26 +4,28 @@ namespace Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
 
 public record ProductDto
 {
-	public Guid Id { get; set; }
-	public string? Name { get; set; }
-	public string? Description { get; set; }
-	public double? Price { get; set; }
-	public string? CategoryName { get; set; }
-	public DateTime CreationDate { get; set; }
-	public string? ImageUrl { get; set; }
+	public Guid Id { get; init; }
+	public string? Name { get; init; }
+	public string? Description { get; init; }
+	public double? Price { get; init; }
+	public bool? Availability { get; init; }
+	public string? CategoryName { get; init; }
+	public DateTime CreationDate { get; init; }
+	public string? ImageUrl { get; init; }
 }
 
 public record ProductForManipulationDto
 {
-	public int ProductId { get; set; }
-	public string? Name { get; set; }
-	public string? Description { get; set; }
+	public int ProductId { get; init; }
+	public string? Name { get; init; }
+	public string? Description { get; init; }
 
 	[Range(1, double.MaxValue)]
-	public double? Price { get; set; }
-	public string? CategoryName { get; set; }
-	public DateTime CreationDate { get; set; }
-	public string? ImageUrl { get; set; }
+	public double? Price { get; init; }
+	public bool? Availability { get; init; }
+	public string? CategoryName { get; init; }
+	public DateTime CreationDate { get; init; }
+	public string? ImageUrl { get; init; }
 }
 
 public record ProductForUpdateDto : ProductForManipulationDto;

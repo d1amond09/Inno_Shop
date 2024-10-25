@@ -5,7 +5,7 @@ namespace Inno_Shop.Services.ProductAPI.Domain.Models;
 public class Product
 {
 	[Key]
-	public Guid Id { get; set; }
+	public Guid ProductID { get; set; }
 	[Required]
 	public string? Name { get; set; }
 	public string? Description { get; set; }
@@ -13,6 +13,7 @@ public class Product
 	[Range(1, double.MaxValue)]
 	public double? Price { get; set; }
 	public string? CategoryName { get; set; }
+	public bool? Availability { get; set; }
 	public DateTime CreationDate { get; set; }
 	public string? ImageUrl { get; set; }
 

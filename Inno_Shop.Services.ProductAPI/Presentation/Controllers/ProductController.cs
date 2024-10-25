@@ -12,7 +12,6 @@ public class ProductController(IProductService service) : ControllerBase
 	[HttpGet]
 	public async Task<IActionResult> GetProducts()
 	{
-		throw new Exception("Exception");
 		var products = await _service.GetProducts(trackChanges: false);
 		return Ok(products);
 	}

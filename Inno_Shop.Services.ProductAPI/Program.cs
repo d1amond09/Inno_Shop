@@ -29,19 +29,19 @@ public class Program
 
 		app.Run();
 	}
-	public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+
+	public static void ConfigureServices(IServiceCollection s, IConfiguration c)
 	{
-		services.AddControllers();
+		s.AddControllers();
 
-		services.AddEndpointsApiExplorer();
-		services.AddSwaggerGen();
+		s.AddEndpointsApiExplorer();
+		s.AddSwaggerGen();
 
-		services.AddDbContext<AppDbContext>(op =>
-			op.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+		s.ConfigureSqlContext(c);
 
-		services.TryAddScoped<IProductRepository, ProductRepository>();
-		services.TryAddScoped<IProductService, ProductService>();
-		services.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
+		s.ConfigureProductRepository();
+		s.ConfigureProductService();
+		s.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
 	}
 
 	public static void ConfigureApp(IApplicationBuilder app)

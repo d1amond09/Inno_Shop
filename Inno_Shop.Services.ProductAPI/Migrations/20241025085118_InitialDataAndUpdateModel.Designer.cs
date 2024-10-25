@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inno_Shop.Services.ProductAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240610212904_AddProductModelToDb")]
-    partial class AddProductModelToDb
+    [Migration("20241025085118_InitialDataAndUpdateModel")]
+    partial class InitialDataAndUpdateModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,13 +25,14 @@ namespace Inno_Shop.Services.ProductAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Inno_Shop.Services.ProductAPI.Models.Product", b =>
+            modelBuilder.Entity("Inno_Shop.Services.ProductAPI.Domain.Models.Product", b =>
                 {
-                    b.Property<int>("ProductId")
+                    b.Property<Guid>("ProductID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
+                    b.Property<bool?>("Availability")
+                        .HasColumnType("bit");
 
                     b.Property<string>("CategoryName")
                         .HasColumnType("nvarchar(max)");
@@ -53,7 +54,7 @@ namespace Inno_Shop.Services.ProductAPI.Migrations
                         .IsRequired()
                         .HasColumnType("float");
 
-                    b.HasKey("ProductId");
+                    b.HasKey("ProductID");
 
                     b.ToTable("Products");
                 });
