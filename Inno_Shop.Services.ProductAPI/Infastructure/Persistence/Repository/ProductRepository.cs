@@ -21,11 +21,14 @@ public class ProductRepository(AppDbContext db) : RepositoryBase<Product>(db), I
 		ProductParameters productParameters, 
 		bool trackChanges)
 	{
-		var products = await FindAll(trackChanges)
-			.OrderBy(e => e.Name)
-			.Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
-			.Take(productParameters.PageSize)
-			.ToListAsync();
+		var products = await FindByCondition(p => 
+			p.Price >= productParameters.MinPrice && 
+			p.Price <= productParameters.MaxPrice, 
+			trackChanges)
+				.OrderBy(e => e.Name)
+				.Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
+				.Take(productParameters.PageSize)
+				.ToListAsync();
 
 		var count = await FindAll(trackChanges).CountAsync();
 
