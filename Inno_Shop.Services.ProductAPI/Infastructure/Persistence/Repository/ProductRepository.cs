@@ -26,7 +26,7 @@ public class ProductRepository(AppDbContext db) : RepositoryBase<Product>(db), I
 			await FindAll(trackChanges)
 				.FilterProducts(productParameters.MinPrice, productParameters.MaxPrice)
 				.Search(productParameters.SearchTerm)
-				.OrderBy(e => e.Name)
+				.Sort(productParameters.OrderBy)
 				.Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
 				.Take(productParameters.PageSize)
 				.ToListAsync();
