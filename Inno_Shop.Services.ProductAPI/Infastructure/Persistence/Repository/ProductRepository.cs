@@ -3,6 +3,7 @@ using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 using Inno_Shop.Services.ProductAPI.Core.Domain.RequestFeatures;
 using Inno_Shop.Services.ProductAPI.Domain.Models;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
+using Inno_Shop.Services.ProductAPI.Infastructure.Persistence.Extensions;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,10 +22,10 @@ public class ProductRepository(AppDbContext db) : RepositoryBase<Product>(db), I
 		ProductParameters productParameters, 
 		bool trackChanges)
 	{
-		var products = await FindByCondition(p => 
-			p.Price >= productParameters.MinPrice && 
-			p.Price <= productParameters.MaxPrice, 
-			trackChanges)
+		var products = 
+			await FindAll(trackChanges)
+				.FilterProducts(productParameters.MinPrice, productParameters.MaxPrice)
+				.Search(productParameters.SearchTerm)
 				.OrderBy(e => e.Name)
 				.Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
 				.Take(productParameters.PageSize)
