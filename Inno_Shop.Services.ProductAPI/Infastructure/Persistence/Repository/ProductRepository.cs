@@ -1,4 +1,6 @@
-﻿using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
+﻿using System.ComponentModel.Design;
+using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
+using Inno_Shop.Services.ProductAPI.Core.Domain.RequestFeatures;
 using Inno_Shop.Services.ProductAPI.Domain.Models;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence.Repository;
@@ -15,10 +17,26 @@ public class ProductRepository(AppDbContext db) : RepositoryBase<Product>(db), I
 		FindByCondition(c => c.ProductID.Equals(productId), trackChanges)
 		.SingleOrDefaultAsync();
 
-	public async Task<IEnumerable<Product>> GetProductsAsync(bool trackChanges) =>
-		await FindAll(trackChanges)
-		.OrderBy(c => c.Name)
-		.ToListAsync();
+	public async Task<PagedList<Product>> GetProductsAsync(
+		ProductParameters productParameters, 
+		bool trackChanges)
+	{
+		var products = await FindAll(trackChanges)
+			.OrderBy(e => e.Name)
+			.Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
+			.Take(productParameters.PageSize)
+			.ToListAsync();
+
+		var count = await FindAll(trackChanges).CountAsync();
+
+		return new PagedList<Product>(
+			products, 
+			count, 
+			productParameters.PageNumber,
+			productParameters.PageSize
+		);
+	}
+		
 
 	public Task SaveAsync() => _db.SaveChangesAsync();
 }

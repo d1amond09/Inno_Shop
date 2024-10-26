@@ -6,6 +6,8 @@ using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 using MediatR;
 using Inno_Shop.Services.ProductAPI.Core.Application.Queries;
 using Inno_Shop.Services.ProductAPI.Core.Application.Commands;
+using Inno_Shop.Services.ProductAPI.Core.Domain.RequestFeatures;
+using System.Text.Json;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Controllers;
 
@@ -16,12 +18,13 @@ public class ProductController(ISender sender) : ApiControllerBase
 	private readonly ISender _sender = sender;
 
 	[HttpGet]
-	public async Task<IActionResult> GetProducts()
+	public async Task<IActionResult> GetProducts([FromQuery] ProductParameters productParameters)
 	{
-		var baseResult = await _sender.Send(new GetProductsQuery(TrackChanges: false));
-		var products = baseResult.GetResult<IEnumerable<ProductDto>>();
-		return Ok(products);
+		var baseResult = await _sender.Send(new GetProductsQuery(productParameters, TrackChanges: false));
+		var (products, metaData) = baseResult.GetResult<(IEnumerable<ProductDto> products, MetaData metaData)>();
 
+		Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(metaData));
+		return Ok(products);
 	}
 
 	[HttpGet("{id:guid}", Name = "ProductById")]
