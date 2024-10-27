@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using AspNetCoreRateLimit;
+using FluentValidation;
 using Inno_Shop.Services.ProductAPI.Core.Application;
 using Inno_Shop.Services.ProductAPI.Core.Application.Behaviors;
 using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
@@ -57,15 +58,33 @@ public static class ServiceExtensions
 
 	public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
 		services.AddHttpCacheHeaders(
-			(expirationOpt) =>
-			{
+			(expirationOpt) => {
 				expirationOpt.MaxAge = 120;
 				expirationOpt.CacheLocation = CacheLocation.Private;
 			},
-			(validationOpt) =>
-			{
+			(validationOpt) => {
 				validationOpt.MustRevalidate = true;
 			}
 		);
-		
+
+	public static void ConfigureRateLimitingOptions(this IServiceCollection services)
+	{
+		List<RateLimitRule> rateLimitRules = [
+			new() {
+				Endpoint = "*",
+				Limit = 10,
+				Period = "1s"
+			}
+		];
+
+		services.Configure<IpRateLimitOptions>(opt => {
+			opt.GeneralRules = rateLimitRules;
+		});
+
+		services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+		services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+		services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+		services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+	}
+
 }

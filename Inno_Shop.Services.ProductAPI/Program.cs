@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,10 @@ public class Program
 		s.ConfigureFluentValidation();
 		s.ConfigureResponseCaching();
 		s.ConfigureHttpCacheHeaders();
+		s.AddMemoryCache();
+
+		s.ConfigureRateLimitingOptions();
+		s.AddHttpContextAccessor();
 
 		s.Configure<ApiBehaviorOptions>(options =>
 		{
@@ -55,6 +60,7 @@ public class Program
 	public static void ConfigureApp(IApplicationBuilder app)
 	{
 		app.UseExceptionHandler();
+		app.UseIpRateLimiting();
 		app.UseCors("CorsPolicy");
 		app.UseResponseCaching();
 		app.UseHttpCacheHeaders();
