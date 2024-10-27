@@ -8,6 +8,7 @@ using Inno_Shop.Services.ProductAPI.Core.Application.Queries;
 using Inno_Shop.Services.ProductAPI.Core.Application.Commands;
 using Inno_Shop.Services.ProductAPI.Core.Domain.RequestFeatures;
 using System.Text.Json;
+using Marvin.Cache.Headers;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Controllers;
 

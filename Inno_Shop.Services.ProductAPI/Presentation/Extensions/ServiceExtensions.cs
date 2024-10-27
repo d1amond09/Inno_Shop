@@ -5,6 +5,7 @@ using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
 using Inno_Shop.Services.ProductAPI.Presentation.GlobalException;
 using Inno_Shop.Services.ProductAPI.Repository;
+using Marvin.Cache.Headers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,4 +51,21 @@ public static class ServiceExtensions
 
 	public static void ConfigureExceptionHandler(this IServiceCollection services) =>
 		services.AddExceptionHandler<GlobalExceptionHandler>();
+
+	public static void ConfigureResponseCaching(this IServiceCollection services) =>
+		services.AddResponseCaching();
+
+	public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
+		services.AddHttpCacheHeaders(
+			(expirationOpt) =>
+			{
+				expirationOpt.MaxAge = 120;
+				expirationOpt.CacheLocation = CacheLocation.Private;
+			},
+			(validationOpt) =>
+			{
+				validationOpt.MustRevalidate = true;
+			}
+		);
+		
 }

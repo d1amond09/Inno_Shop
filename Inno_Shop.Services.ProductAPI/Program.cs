@@ -1,14 +1,6 @@
-//using Hellang.Middleware.ProblemDetails;
-using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
-using Inno_Shop.Services.ProductAPI.Infastructure.Persistence;
-using Inno_Shop.Services.ProductAPI.Presentation;
 using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
-using Inno_Shop.Services.ProductAPI.Repository;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 
 namespace Inno_Shop.Services.ProductAPI;
 
@@ -41,6 +33,8 @@ public class Program
 		s.ConfigureMediatR(); 
 		s.ConfigureAutoMapper();
 		s.ConfigureFluentValidation();
+		s.ConfigureResponseCaching();
+		s.ConfigureHttpCacheHeaders();
 
 		s.Configure<ApiBehaviorOptions>(options =>
 		{
@@ -51,13 +45,19 @@ public class Program
 		{
 			config.RespectBrowserAcceptHeader = true;
 			config.ReturnHttpNotAcceptable = true;
+			config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+			{
+				Duration = 120
+			});
 		});
 	}
 
 	public static void ConfigureApp(IApplicationBuilder app)
 	{
-		app.UseExceptionHandler(opt => { });
+		app.UseExceptionHandler();
 		app.UseCors("CorsPolicy");
+		app.UseResponseCaching();
+		app.UseHttpCacheHeaders();
 		app.UseHttpsRedirection();
 		app.UseStaticFiles();
 		app.UseForwardedHeaders(new ForwardedHeadersOptions
