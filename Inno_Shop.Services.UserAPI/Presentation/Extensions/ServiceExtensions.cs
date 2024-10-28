@@ -1,7 +1,10 @@
-﻿using Inno_Shop.Services.UserAPI.Core.Domain.Models;
+﻿using Inno_Shop.Services.UserAPI.Core.Application;
+using Inno_Shop.Services.UserAPI.Presentation;
+using Inno_Shop.Services.UserAPI.Core.Domain.Models;
 using Inno_Shop.Services.UserAPI.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Inno_Shop.Services.UserAPI.Presentation.GlobalException;
 
 namespace Inno_Shop.Services.UserAPI.Presentation.Extensions;
 
@@ -40,4 +43,14 @@ public static class ServiceExtensions
 		.AddEntityFrameworkStores<UserDbContext>()
 		.AddDefaultTokenProviders();
 	}
+
+	public static void ConfigureAutoMapper(this IServiceCollection services) =>
+		services.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
+
+	public static void ConfigureMediatR(this IServiceCollection services) =>
+		services.AddMediatR(cfg =>
+			cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly));
+
+	public static void ConfigureExceptionHandler(this IServiceCollection services) =>
+		services.AddExceptionHandler<GlobalExceptionHandler>();
 }

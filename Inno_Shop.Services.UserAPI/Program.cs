@@ -11,15 +11,11 @@ public class Program
 		var builder = WebApplication.CreateBuilder(args);
 
 		ConfigureServices(builder.Services, builder.Configuration);
-		builder.Services.AddControllers();
 
 		var app = builder.Build();
 
 
 		app.UseHttpsRedirection();
-
-		app.UseAuthorization();
-
 
 		app.MapControllers();
 
@@ -28,10 +24,14 @@ public class Program
 
 	public static void ConfigureServices(IServiceCollection s, IConfiguration c)
 	{
+		s.AddProblemDetails();
+		s.ConfigureExceptionHandler();
 		s.AddAuthentication();
 		s.ConfigureIdentity();
 		s.AddHttpContextAccessor();
 		s.ConfigureSqlContext(c);
+		s.ConfigureMediatR();
+		s.ConfigureAutoMapper();
 
 		s.AddControllers(config =>
 		{
@@ -42,6 +42,7 @@ public class Program
 
 	public static void ConfigureApp(IApplicationBuilder app)
 	{
+		app.UseExceptionHandler();
 		app.UseCors("CorsPolicy");
 		app.UseStaticFiles();
 		app.UseForwardedHeaders(new ForwardedHeadersOptions
