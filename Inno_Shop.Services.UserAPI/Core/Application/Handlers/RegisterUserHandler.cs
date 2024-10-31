@@ -6,12 +6,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-internal sealed class RegisterUserHandler(IMapper mapper, UserManager<User> userManager, IConfiguration config) : 
-	IRequestHandler<RegisterUserCommand, IdentityResult>
+internal sealed class RegisterUserCommandHandler(IMapper mapper, UserManager<User> userManager) : IRequestHandler<RegisterUserCommand, IdentityResult>
 {
-	private readonly IConfiguration _configuration = config;
-	private readonly UserManager<User> _userManager = userManager;
 	private readonly IMapper _mapper = mapper;
+	private readonly UserManager<User> _userManager = userManager;
 
 	public async Task<IdentityResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
 	{

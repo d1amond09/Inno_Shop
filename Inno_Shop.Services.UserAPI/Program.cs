@@ -24,10 +24,11 @@ public class Program
 
 	public static void ConfigureServices(IServiceCollection s, IConfiguration c)
 	{
-		s.AddProblemDetails();
-		s.ConfigureExceptionHandler();
 		s.AddAuthentication();
 		s.ConfigureIdentity();
+		s.ConfigureJWT(c);
+		s.AddProblemDetails();
+		s.ConfigureExceptionHandler();
 		s.AddHttpContextAccessor();
 		s.ConfigureSqlContext(c);
 		s.ConfigureMediatR();
