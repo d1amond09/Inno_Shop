@@ -46,15 +46,11 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
 		{
 			return Unauthorized("Invalid username or password.");
 		}
-		var token = await _sender.Send(new CreateTokenCommand(user));
 
-		return Ok(new { Token = token });
-	}
+		var tokenDto = await _sender.Send(new CreateTokenCommand(user, PopulateExp: true));
 
-	public async Task<string> CreateToken(User user)
-	{
-		var command = new CreateTokenCommand(user);
-		return await _sender.Send(command);
+		return Ok(tokenDto);
+
 	}
 }
 

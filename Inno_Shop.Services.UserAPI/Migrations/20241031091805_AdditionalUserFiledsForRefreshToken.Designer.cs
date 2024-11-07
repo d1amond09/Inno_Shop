@@ -4,6 +4,7 @@ using Inno_Shop.Services.UserAPI.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inno_Shop.Services.UserAPI.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241031091805_AdditionalUserFiledsForRefreshToken")]
+    partial class AdditionalUserFiledsForRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,16 +131,14 @@ namespace Inno_Shop.Services.UserAPI.Migrations
                     b.HasData(
                         new
                         {
-							Id = "562419f5-eed1-473b-bcc1-9f2dbab182b4",
-							ConcurrencyStamp = "937e9988-9f49-4bab-a545-b422dde85016",
-							Name = "Administrator",
+                            Id = "83029ce4-52d8-4648-a1d3-c2b31595d00d",
+                            Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-							Id = "4ac8240a-8498-4869-bc86-60e5dc982d27",
-							ConcurrencyStamp = "ec511bd4-4853-426a-a2fc-751886560c9a",
-							Name = "User",
+                            Id = "a9aa6094-2b13-4ef3-8ef3-0234c1fe8c96",
+                            Name = "User",
                             NormalizedName = "USER"
                         });
                 });

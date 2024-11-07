@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-public class ValidateUserCommandHandler(UserManager<User> userManager) : IRequestHandler<ValidateUserCommand, bool>
+public class ValidateUserCommandHandler(UserManager<User> userManager) : 
+	IRequestHandler<ValidateUserCommand, bool>
 {
 	private readonly UserManager<User> _userManager = userManager;
 

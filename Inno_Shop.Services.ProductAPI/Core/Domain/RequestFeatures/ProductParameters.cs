@@ -12,6 +12,7 @@ public class ProductParameters : RequestParameters
 	public double MinPrice { get; set; }
 	public double MaxPrice { get; set; } = double.MaxValue;
 	public bool ValidPriceRange => MaxPrice > MinPrice;
+	public bool NotValidPriceRange => MaxPrice <= MinPrice;
 	public string SearchTerm { get; set; } = string.Empty;
     public ProductParameters()
     {

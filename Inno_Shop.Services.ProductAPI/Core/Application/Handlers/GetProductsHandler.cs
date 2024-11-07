@@ -17,10 +17,13 @@ public class GetProductsHandler(IProductRepository rep, IMapper mapper) : IReque
 
 	public async Task<ApiBaseResponse> Handle(GetProductsQuery request, CancellationToken cancellationToken)
 	{
-		if (!request.ProductParameters.ValidPriceRange) throw new MaxPriceRangeBadRequestException();
+		if (request.ProductParameters.NotValidPriceRange)
+			return new ApiMaxPriceRangeBadRequestResponse();
+
 		var productsWithMetaData = await _rep.GetProductsAsync(request.ProductParameters, request.TrackChanges);
 		var productsDto = _mapper.Map<IEnumerable<ProductDto>>(productsWithMetaData);
-		(IEnumerable<ProductDto> products, MetaData metaData) result = new(productsDto, productsWithMetaData.MetaData);
+
+		(IEnumerable<ProductDto>, MetaData) result = new(productsDto, productsWithMetaData.MetaData);
 		return new ApiOkResponse<(IEnumerable<ProductDto>, MetaData)>(result);
 	}
 }

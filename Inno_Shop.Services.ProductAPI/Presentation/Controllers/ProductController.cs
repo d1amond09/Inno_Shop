@@ -57,7 +57,10 @@ public class ProductController(ISender sender) : ApiControllerBase
 	[HttpDelete("{id:guid}")]
 	public async Task<IActionResult> DeleteProduct(Guid id)
 	{
-		await _sender.Send(new DeleteProductCommand(id, TrackChanges: false));
+		var baseResult = await _sender.Send(new DeleteProductCommand(id, TrackChanges: false));
+		
+		if (!baseResult.Success)
+			return ProcessError(baseResult);
 
 		return NoContent();
 	}
@@ -68,7 +71,13 @@ public class ProductController(ISender sender) : ApiControllerBase
 		if (product is null)
 			return BadRequest("ProductForUpdateDto object is null");
 
-		await _sender.Send(new UpdateProductCommand(id, product, TrackChanges: true));
+		// сделать валидацию в Application -> Validators
+
+
+		var baseResult = await _sender.Send(new UpdateProductCommand(id, product, TrackChanges: true));
+
+		if (!baseResult.Success)
+			return ProcessError(baseResult);
 
 		return NoContent();
 	}
