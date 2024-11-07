@@ -5,20 +5,30 @@ using System.Text;
 using AutoMapper;
 using Azure.Core;
 using Inno_Shop.Services.UserAPI.Core.Application.Commands;
+using Inno_Shop.Services.UserAPI.Core.Domain.ConfigurationModels;
 using Inno_Shop.Services.UserAPI.Core.Domain.DataTransferObjects;
 using Inno_Shop.Services.UserAPI.Core.Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-public class CreateTokenHandler(UserManager<User> userManager, IConfiguration configuration) : IRequestHandler<CreateTokenCommand, TokenDto>
+public class CreateTokenHandler : IRequestHandler<CreateTokenCommand, TokenDto>
 {
-	private readonly UserManager<User> _userManager = userManager;
-	private readonly IConfiguration _configuration = configuration;
+    private readonly IOptionsMonitor<JwtConfiguration> _configuration;
+	private readonly JwtConfiguration _jwtConfiguration;
+	private readonly UserManager<User> _userManager;
 
-	public async Task<TokenDto> Handle(CreateTokenCommand request, CancellationToken cancellationToken)
+    public CreateTokenHandler(UserManager<User> userManager, IOptionsMonitor<JwtConfiguration> configuration)
+    {
+        _userManager = userManager;
+        _configuration = configuration;
+		_jwtConfiguration = _configuration.Get("JwtSettings");
+    }
+
+    public async Task<TokenDto> Handle(CreateTokenCommand request, CancellationToken cancellationToken)
 	{
 		var signingCredentials = GetSigningCredentials();
 		var claims = await GetClaims(request.User);
@@ -49,12 +59,12 @@ public class CreateTokenHandler(UserManager<User> userManager, IConfiguration co
 	private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
 	{
 		var tokenOptions = new JwtSecurityToken(
-            issuer: _configuration["JwtSettings:validIssuer"],
-			audience: _configuration["JwtSettings:validAudience"],
-            claims: claims,
-			expires: DateTime.Now.AddMinutes(30),
+            issuer: _jwtConfiguration.ValidIssuer,
+			audience: _jwtConfiguration.ValidAudience,
+			claims: claims,
+			expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtConfiguration.Expires)),
 			signingCredentials: signingCredentials
-		);
+        );
 
 		return tokenOptions;
 	}

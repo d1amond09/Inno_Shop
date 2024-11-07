@@ -22,22 +22,23 @@ public class Program
 		app.Run();
 	}
 
-	public static void ConfigureServices(IServiceCollection s, IConfiguration c)
+	public static void ConfigureServices(IServiceCollection s, IConfiguration config)
 	{
 		s.AddAuthentication();
 		s.ConfigureIdentity();
-		s.ConfigureJWT(c);
-		s.AddProblemDetails();
+		s.ConfigureJWT(config);
+        s.AddJwtConfiguration(config);
+        s.AddProblemDetails();
 		s.ConfigureExceptionHandler();
 		s.AddHttpContextAccessor();
-		s.ConfigureSqlContext(c);
+		s.ConfigureSqlContext(config);
 		s.ConfigureMediatR();
 		s.ConfigureAutoMapper();
 
-		s.AddControllers(config =>
+		s.AddControllers(cnfg =>
 		{
-			config.RespectBrowserAcceptHeader = true;
-			config.ReturnHttpNotAcceptable = true;
+			cnfg.RespectBrowserAcceptHeader = true;
+            cnfg.ReturnHttpNotAcceptable = true;
 		});
 	}
 

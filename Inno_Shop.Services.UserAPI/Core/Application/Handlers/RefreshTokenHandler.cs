@@ -4,20 +4,31 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Inno_Shop.Services.UserAPI.Core.Application.Commands;
+using Inno_Shop.Services.UserAPI.Core.Domain.ConfigurationModels;
 using Inno_Shop.Services.UserAPI.Core.Domain.DataTransferObjects;
 using Inno_Shop.Services.UserAPI.Core.Domain.Exceptions;
 using Inno_Shop.Services.UserAPI.Core.Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-public class RefreshTokenHandler(UserManager<User> userManager, IConfiguration configuration, ISender sender) : IRequestHandler<RefreshTokenCommand, TokenDto>
+public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, TokenDto>
 {
-	private readonly UserManager<User> _userManager = userManager;
-	private readonly IConfiguration _configuration = configuration;
-    private readonly ISender _sender = sender;
+    private readonly IOptionsMonitor<JwtConfiguration> _configuration;
+	private readonly JwtConfiguration _jwtConfiguration;
+	private readonly UserManager<User> _userManager;
+    private readonly ISender _sender;
+
+    public RefreshTokenHandler(UserManager<User> userManager, IOptionsMonitor<JwtConfiguration> configuration, ISender sender)
+    {
+        _configuration = configuration;
+        _jwtConfiguration = _configuration.Get("JwtSettings");
+        _userManager = userManager;
+        _sender = sender;
+    }
 
     public async Task<TokenDto> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
 	{
@@ -33,8 +44,6 @@ public class RefreshTokenHandler(UserManager<User> userManager, IConfiguration c
 
 	public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
 	{
-		var jwtSettings = _configuration.GetSection("JwtSettings");
-
 		var tokenValidationParameters = new TokenValidationParameters
 		{
 			ValidateAudience = true,
@@ -43,9 +52,9 @@ public class RefreshTokenHandler(UserManager<User> userManager, IConfiguration c
 			IssuerSigningKey = new SymmetricSecurityKey(
 				Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET"))),
 			ValidateLifetime = true,
-			ValidIssuer = jwtSettings["validIssuer"],
-			ValidAudience = jwtSettings["validAudience"]
-		};
+            ValidIssuer = _jwtConfiguration.ValidIssuer,
+            ValidAudience = _jwtConfiguration.ValidAudience
+        };
 
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
