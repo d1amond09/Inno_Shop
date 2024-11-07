@@ -7,9 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{A8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inno_Shop.Services.ProductAPI", "Inno_Shop.Services.ProductAPI\Inno_Shop.Services.ProductAPI.csproj", "{3F1CA92E-60AA-45C1-BCBC-F9B64DD4C0B4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{5554B1A8-57D6-4623-B9E3-D58FDB3AEDF9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inno_Shop.Services.UserAPI", "Inno_Shop.Services.UserAPI\Inno_Shop.Services.UserAPI.csproj", "{588E33DC-6D8A-416B-B759-7E4BDF88CD5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inno_Shop.Services.UserAPI", "Inno_Shop.Services.UserAPI\Inno_Shop.Services.UserAPI.csproj", "{588E33DC-6D8A-416B-B759-7E4BDF88CD5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

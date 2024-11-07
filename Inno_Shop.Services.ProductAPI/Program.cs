@@ -1,11 +1,19 @@
 using System.Text;
 using AspNetCoreRateLimit;
+using Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
+using Inno_Shop.Services.ProductAPI.Core.Application.Service;
+using Inno_Shop.Services.ProductAPI.Core.Application.Utility;
+using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
+using Inno_Shop.Services.ProductAPI.Presentation.ActionFilters;
 using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 using Inno_Shop.Services.UserAPI.Core.Domain.ConfigurationModels;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Options;
 
 namespace Inno_Shop.Services.ProductAPI;
 
@@ -51,6 +59,10 @@ public class Program
         s.ConfigureSwagger();
         s.AddJwtConfiguration(c);
 
+        s.AddScoped<IDataShaper<ProductDto>, DataShaper<ProductDto>>();
+        s.AddScoped<IProductLinks, ProductLinks>();
+        s.AddScoped<ValidateMediaTypeAttribute>();
+
         s.ConfigureRateLimitingOptions();
 		s.AddHttpContextAccessor();
 
@@ -64,10 +76,15 @@ public class Program
 			config.RespectBrowserAcceptHeader = true;
 			config.ReturnHttpNotAcceptable = true;
 			config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
-            {
-                Duration = 120
-            });
-        });
+			{
+				Duration = 120
+			});
+			config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+		}).AddNewtonsoftJson()
+		.AddCustomCSVFormatter()
+		.AddXmlDataContractSerializerFormatters();
+
+        s.AddCustomMediaTypes();
 
         var jwtConfiguration = new JwtConfiguration();
         c.Bind(jwtConfiguration.Section, jwtConfiguration);
@@ -109,5 +126,9 @@ public class Program
         app.UseAuthorization();
     }
 
-
+    public static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() =>
+		new ServiceCollection().AddLogging().AddMvc().AddNewtonsoftJson()
+		.Services.BuildServiceProvider()
+		.GetRequiredService<IOptions<MvcOptions>>().Value.InputFormatters
+		.OfType<NewtonsoftJsonPatchInputFormatter>().First();
 }

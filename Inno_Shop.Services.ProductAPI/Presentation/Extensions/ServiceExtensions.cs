@@ -9,8 +9,11 @@ using Inno_Shop.Services.ProductAPI.Repository;
 using Inno_Shop.Services.UserAPI.Core.Domain.ConfigurationModels;
 using Marvin.Cache.Headers;
 using MediatR;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Inno_Shop.Services.ProductAPI.Presentation.Formatters.Output;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 
@@ -69,7 +72,35 @@ public static class ServiceExtensions
 			}
 		);
 
-	public static void ConfigureRateLimitingOptions(this IServiceCollection services)
+    public static IMvcBuilder AddCustomCSVFormatter(this IMvcBuilder builder) =>
+		builder.AddMvcOptions(config => 
+			config.OutputFormatters.Add(new	CsvOutputFormatter()));
+
+    public static void AddCustomMediaTypes(this IServiceCollection services)
+    {
+        services.Configure<MvcOptions>(config =>
+        {
+            var newtonsoftJsonOutputFormatter = config.OutputFormatters
+                .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+
+            newtonsoftJsonOutputFormatter?.SupportedMediaTypes
+                .Add("application/hateoas+json");
+
+            newtonsoftJsonOutputFormatter?.SupportedMediaTypes
+                .Add("application/apiroot+json");
+
+            var xmlOutputFormatter = config.OutputFormatters
+                .OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
+
+            xmlOutputFormatter?.SupportedMediaTypes
+                .Add("application/hateoas+xml");
+
+            xmlOutputFormatter?.SupportedMediaTypes
+                .Add("application/apiroot+xml");
+        });
+    }
+
+    public static void ConfigureRateLimitingOptions(this IServiceCollection services)
 	{
 		List<RateLimitRule> rateLimitRules = [
 			new() {

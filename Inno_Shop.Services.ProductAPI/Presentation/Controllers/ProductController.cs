@@ -10,6 +10,10 @@ using Inno_Shop.Services.ProductAPI.Core.Domain.RequestFeatures;
 using System.Text.Json;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authorization;
+using System.Dynamic;
+using Inno_Shop.Services.ProductAPI.Presentation.ActionFilters;
+using Inno_Shop.Services.ProductAPI.Core.Domain.Models;
+using Inno_Shop.Services.ProductAPI.Core.Domain.LinkModels;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Controllers;
 
@@ -21,14 +25,19 @@ public class ProductController(ISender sender) : ApiControllerBase
 {
 	private readonly ISender _sender = sender;
 
-	[HttpGet]
-	public async Task<IActionResult> GetProducts([FromQuery] ProductParameters productParameters)
+	[HttpGet(Name = "GetProducts")]
+    [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
+    public async Task<IActionResult> GetProducts([FromQuery] ProductParameters productParameters)
 	{
-		var baseResult = await _sender.Send(new GetProductsQuery(productParameters, TrackChanges: false));
-		var (products, metaData) = baseResult.GetResult<(IEnumerable<ProductDto> products, MetaData metaData)>();
+		var linkParams = new LinkParameters(productParameters, HttpContext);
+		var baseResult = await _sender.Send(new GetProductsQuery(linkParams, TrackChanges: false));
+        var (linkResponse, metaData) = baseResult.GetResult<(LinkResponse, MetaData)>();
 
 		Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(metaData));
-		return Ok(products);
+        
+		return linkResponse.HasLinks ? 
+			Ok(linkResponse.LinkedEntities) : 
+			Ok(linkResponse.ShapedEntities);
 	}
 
     [Authorize]
@@ -45,7 +54,7 @@ public class ProductController(ISender sender) : ApiControllerBase
 	}
 
     [Authorize]
-    [HttpPost]
+    [HttpPost(Name = "CreateProduct")]
 	public async Task<IActionResult> CreateProduct([FromBody] ProductForCreationDto product)
 	{
 		if (product is null)
