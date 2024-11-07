@@ -4,7 +4,7 @@ public class ShapedEntity
 {
     public ShapedEntity()
     {
-        Entity = new Entity();
+        Entity = [];
     }
     public Guid Id { get; set; }
     public Entity Entity { get; set; }

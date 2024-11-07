@@ -14,6 +14,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Inno_Shop.Services.ProductAPI.Presentation.Formatters.Output;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Inno_Shop.Services.ProductAPI.Core.Application.Service;
+using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
+using Inno_Shop.Services.ProductAPI.Core.Application.Utility;
+using Inno_Shop.Services.ProductAPI.Presentation.ActionFilters;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 
@@ -72,10 +78,6 @@ public static class ServiceExtensions
 			}
 		);
 
-    public static IMvcBuilder AddCustomCSVFormatter(this IMvcBuilder builder) =>
-		builder.AddMvcOptions(config => 
-			config.OutputFormatters.Add(new	CsvOutputFormatter()));
-
     public static void AddCustomMediaTypes(this IServiceCollection services)
     {
         services.Configure<MvcOptions>(config =>
@@ -120,9 +122,38 @@ public static class ServiceExtensions
 		services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
 	}
 
-    public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static void ConfigureDataShaping(this IServiceCollection services) =>
+        services.AddScoped<IDataShaper<ProductDto>, DataShaper<ProductDto>>();
+
+    public static void ConfigureHATEOAS(this IServiceCollection services)
     {
-        services.Configure<JwtConfiguration>("JwtSettings", configuration.GetSection("JwtSettings"));
+        services.AddScoped<IProductLinks, ProductLinks>();
+        services.AddScoped<ValidateMediaTypeAttribute>();
+    }
+
+    public static void AddJwtAuthenticationConfiguration(this IServiceCollection services, IConfiguration config)
+    {
+        services.Configure<JwtConfiguration>("JwtSettings", config.GetSection("JwtSettings"));
+        var jwtConfiguration = new JwtConfiguration();
+        config.Bind(jwtConfiguration.Section, jwtConfiguration);
+        var secretKey = config.GetValue<string>("SECRET");
+        ArgumentNullException.ThrowIfNull(secretKey);
+
+        services.AddAuthentication("Bearer").AddJwtBearer("Bearer", opt =>
+        {
+            opt.Authority = "https://localhost:7243";
+            opt.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer = jwtConfiguration.ValidIssuer,
+                ValidAudience = jwtConfiguration.ValidAudience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+            };
+        });
     }
 
     public static void ConfigureSwagger(this IServiceCollection services)

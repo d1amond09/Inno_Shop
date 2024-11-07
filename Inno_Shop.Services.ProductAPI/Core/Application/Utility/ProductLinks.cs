@@ -7,16 +7,10 @@ using Microsoft.Net.Http.Headers;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Utility;
 
-public class ProductLinks : IProductLinks
+public class ProductLinks(LinkGenerator linkGenerator, IDataShaper<ProductDto> dataShaper) : IProductLinks
 {
-    private readonly LinkGenerator _linkGenerator;
-    private readonly IDataShaper<ProductDto> _dataShaper;
-
-    public ProductLinks(LinkGenerator linkGenerator, IDataShaper<ProductDto> dataShaper)
-    {
-        _linkGenerator = linkGenerator;
-        _dataShaper = dataShaper;
-    }
+    private readonly LinkGenerator _linkGenerator = linkGenerator;
+    private readonly IDataShaper<ProductDto> _dataShaper = dataShaper;
 
     public LinkResponse TryGenerateLinks(IEnumerable<ProductDto> productsDto, string fields, HttpContext httpContext)
     {
@@ -38,15 +32,16 @@ public class ProductLinks : IProductLinks
 
     private bool ShouldGenerateLinks(HttpContext httpContext)
     {
-        var mediaType = (MediaTypeHeaderValue)httpContext.Items["AcceptHeaderMediaType"];
-        return mediaType.SubTypeWithoutSuffix.EndsWith("hateoas",
-        StringComparison.InvariantCultureIgnoreCase);
+        var mediaType = (MediaTypeHeaderValue?) httpContext.Items["AcceptHeaderMediaType"];
+        ArgumentNullException.ThrowIfNull(mediaType);
+        return mediaType.SubTypeWithoutSuffix
+            .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
     }
     private LinkResponse ReturnLinkdedProducts(IEnumerable<ProductDto> productsDto, string fields, HttpContext httpContext, List<Entity> shapedProducts)
     {
         var productDtoList = productsDto.ToList();
 
-        for (var index = 0; index < productDtoList.Count(); index++)
+        for (var index = 0; index < productDtoList.Count; index++)
         {
             var productLinks = CreateLinksForProducts(httpContext, productDtoList[index].ProductID, fields);
             shapedProducts[index].Add("Links", productLinks);
@@ -61,16 +56,16 @@ public class ProductLinks : IProductLinks
     private List<Link> CreateLinksForProducts(HttpContext httpContext, Guid id, string fields = "")
     {
         List<Link> links = [
-            new Link(_linkGenerator.GetUriByAction(httpContext, "GetProduct", values: new { id, fields }), "self", "GET"),
-            new Link(_linkGenerator.GetUriByAction(httpContext, "DeleteProduct", values: new { id }), "delete_employee", "DELETE"),
-            new Link(_linkGenerator.GetUriByAction(httpContext, "UpdateProduct", values: new { id }), "update_employee", "PUT")
+            new Link(_linkGenerator.GetUriByAction(httpContext, "GetProduct", values: new { id, fields })!, "self", "GET"),
+            new Link(_linkGenerator.GetUriByAction(httpContext, "DeleteProduct", values: new { id })!, "delete_employee", "DELETE"),
+            new Link(_linkGenerator.GetUriByAction(httpContext, "UpdateProduct", values: new { id })!, "update_employee", "PUT")
         ];
 
         return links;
     }
     private LinkCollectionWrapper<Entity> CreateLinksForProducts(HttpContext httpContext, LinkCollectionWrapper<Entity> employeesWrapper)
     {
-        employeesWrapper.Links.Add(new Link(_linkGenerator.GetUriByAction(httpContext, "GetProduct", values: new { }), "self", "GET"));
+        employeesWrapper.Links.Add(new Link(_linkGenerator.GetUriByAction(httpContext, "GetProduct", values: new { })!, "self", "GET"));
         return employeesWrapper;
     }
 }

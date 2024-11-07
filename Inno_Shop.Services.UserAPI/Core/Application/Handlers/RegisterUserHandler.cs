@@ -15,9 +15,9 @@ internal sealed class RegisterUserCommandHandler(IMapper mapper, UserManager<Use
 	public async Task<IdentityResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
 	{
 		var user = _mapper.Map<User>(request.UserForRegistrationDto);
-		var result = await _userManager.CreateAsync(user, request.UserForRegistrationDto.Password);
+		var result = await _userManager.CreateAsync(user, request.UserForRegistrationDto.Password!);
 		if (result.Succeeded)
-			await _userManager.AddToRolesAsync(user, request.UserForRegistrationDto.Roles);
+			await _userManager.AddToRolesAsync(user, request.UserForRegistrationDto.Roles!);
 		return result;
 	}
 }

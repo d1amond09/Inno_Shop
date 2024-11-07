@@ -64,8 +64,6 @@ public static class ServiceExtensions
         var jwtConfiguration = new JwtConfiguration();
         configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
 
-        var secretKey = Environment.GetEnvironmentVariable("SECRET");
-
         services.AddAuthentication(opt =>
         {
             opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -82,7 +80,10 @@ public static class ServiceExtensions
 
                 ValidIssuer = jwtConfiguration.ValidIssuer,
                 ValidAudience = jwtConfiguration.ValidAudience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(
+                        configuration.GetValue<string>("SECRET")!
+                ))
             };
         });
     }

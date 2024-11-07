@@ -43,7 +43,7 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
 			return Unauthorized("Invalid username or password.");
 		}
 
-		var user = await _userManager.FindByNameAsync(userForAuth.UserName);
+		var user = await _userManager.FindByNameAsync(userForAuth.UserName!);
 		if (user == null)
 		{
 			return Unauthorized("Invalid username or password.");

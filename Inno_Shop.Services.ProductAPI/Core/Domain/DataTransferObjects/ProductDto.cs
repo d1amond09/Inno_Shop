@@ -18,8 +18,6 @@ public record ProductForManipulationDto
 {
 	public string? Name { get; init; }
 	public string? Description { get; init; }
-
-	[Range(1, double.MaxValue)]
 	public double? Price { get; init; }
 	public bool? Availability { get; init; }
 	public string? CategoryName { get; init; }

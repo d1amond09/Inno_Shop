@@ -57,15 +57,14 @@ public class ProductController(ISender sender) : ApiControllerBase
     [HttpPost(Name = "CreateProduct")]
 	public async Task<IActionResult> CreateProduct([FromBody] ProductForCreationDto product)
 	{
-		if (product is null)
-			return BadRequest("ProductForCreationDto object is null");
+        var baseResult = await _sender.Send(new CreateProductCommand(product));
 
-		if (!ModelState.IsValid)
-			return UnprocessableEntity(ModelState);
-		
-		var createdProduct = await _sender.Send(new CreateProductCommand(product));
+        if (!baseResult.Success)
+            return ProcessError(baseResult);
 
-		return CreatedAtRoute("ProductById", new { id = createdProduct.ProductID }, createdProduct);
+		var createdProduct = baseResult.GetResult<ProductDto>();
+
+        return CreatedAtRoute("ProductById", new { id = createdProduct.ProductID }, createdProduct);
 	}
 
     [Authorize]
@@ -84,13 +83,7 @@ public class ProductController(ISender sender) : ApiControllerBase
     [HttpPut("{id:guid}")]
 	public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductForUpdateDto product)
 	{
-		if (product is null)
-			return BadRequest("ProductForUpdateDto object is null");
-
-		// сделать валидацию в Application -> Validators
-
-
-		var baseResult = await _sender.Send(new UpdateProductCommand(id, product, TrackChanges: true));
+        var baseResult = await _sender.Send(new UpdateProductCommand(id, product, TrackChanges: true));
 
 		if (!baseResult.Success)
 			return ProcessError(baseResult);

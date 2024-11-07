@@ -14,12 +14,11 @@ using MediatR;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Handlers;
 
-public class GetProductsHandler(IProductRepository rep, IMapper mapper, IDataShaper<ProductDto> dataShaper, IProductLinks productLinks) : 
+public class GetProductsHandler(IProductRepository rep, IMapper mapper, IProductLinks productLinks) : 
     IRequestHandler<GetProductsQuery, ApiBaseResponse>
 {
 	private readonly IProductRepository _rep = rep;
 	private readonly IMapper _mapper = mapper;
-    private readonly IDataShaper<ProductDto> _dataShaper = dataShaper;
 	private readonly IProductLinks _productLinks = productLinks;
 
     public async Task<ApiBaseResponse> Handle(GetProductsQuery request, CancellationToken cancellationToken)
@@ -27,10 +26,19 @@ public class GetProductsHandler(IProductRepository rep, IMapper mapper, IDataSha
         if(request.LinkParameters.ProductParameters.NotValidPriceRange)
             return new ApiMaxPriceRangeBadRequestResponse();
 
-        var productsWithMetaData = await _rep.GetProductsAsync(request.LinkParameters.ProductParameters, request.TrackChanges);
-		var productsDto = _mapper.Map<IEnumerable<ProductDto>>(productsWithMetaData);
+        var productsWithMetaData = await _rep.GetProductsAsync(
+            request.LinkParameters.ProductParameters, 
+            request.TrackChanges
+        );
+		
+        var productsDto = _mapper.Map<IEnumerable<ProductDto>>(productsWithMetaData);
 
-        var links = _productLinks.TryGenerateLinks(productsDto, request.LinkParameters.ProductParameters.Fields, request.LinkParameters.Context);
+        var links = _productLinks.TryGenerateLinks(
+            productsDto, 
+            request.LinkParameters.ProductParameters.Fields, 
+            request.LinkParameters.Context
+        );
+
 		(LinkResponse, MetaData) result = new(links, productsWithMetaData.MetaData);
         
         return new ApiOkResponse<(LinkResponse, MetaData)>(result);

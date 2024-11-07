@@ -19,13 +19,15 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, TokenDto
 {
     private readonly IOptionsMonitor<JwtConfiguration> _configuration;
 	private readonly JwtConfiguration _jwtConfiguration;
+	private readonly IConfiguration _config;
 	private readonly UserManager<User> _userManager;
     private readonly ISender _sender;
 
-    public RefreshTokenHandler(UserManager<User> userManager, IOptionsMonitor<JwtConfiguration> configuration, ISender sender)
+    public RefreshTokenHandler(UserManager<User> userManager, IOptionsMonitor<JwtConfiguration> configuration, IConfiguration config, ISender sender)
     {
         _configuration = configuration;
         _jwtConfiguration = _configuration.Get("JwtSettings");
+		_config = config;
         _userManager = userManager;
         _sender = sender;
     }
@@ -33,7 +35,7 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, TokenDto
     public async Task<TokenDto> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
 	{
 		var principal = GetPrincipalFromExpiredToken(request.TokenDto.AccessToken);
-		var user = await _userManager.FindByNameAsync(principal.Identity.Name);
+		var user = await _userManager.FindByNameAsync(principal.Identity?.Name!);
 		if (user == null ||
 			user.RefreshToken != request.TokenDto.RefreshToken ||
 			user.RefreshTokenExpiryTime <= DateTime.Now)
@@ -50,7 +52,7 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, TokenDto
 			ValidateIssuer = true,
 			ValidateIssuerSigningKey = true,
 			IssuerSigningKey = new SymmetricSecurityKey(
-				Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET"))),
+				Encoding.UTF8.GetBytes(_config.GetValue<string>("SECRET")!)),
 			ValidateLifetime = true,
             ValidIssuer = _jwtConfiguration.ValidIssuer,
             ValidAudience = _jwtConfiguration.ValidAudience

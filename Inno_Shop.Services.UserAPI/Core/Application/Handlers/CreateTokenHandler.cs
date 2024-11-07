@@ -10,6 +10,7 @@ using Inno_Shop.Services.UserAPI.Core.Domain.DataTransferObjects;
 using Inno_Shop.Services.UserAPI.Core.Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,12 +21,14 @@ public class CreateTokenHandler : IRequestHandler<CreateTokenCommand, TokenDto>
     private readonly IOptionsMonitor<JwtConfiguration> _configuration;
 	private readonly JwtConfiguration _jwtConfiguration;
 	private readonly UserManager<User> _userManager;
+    private readonly IConfiguration _config;
 
-    public CreateTokenHandler(UserManager<User> userManager, IOptionsMonitor<JwtConfiguration> configuration)
+    public CreateTokenHandler(UserManager<User> userManager, IOptionsMonitor<JwtConfiguration> configuration, IConfiguration config)
     {
         _userManager = userManager;
         _configuration = configuration;
 		_jwtConfiguration = _configuration.Get("JwtSettings");
+		_config = config;
     }
 
     public async Task<TokenDto> Handle(CreateTokenCommand request, CancellationToken cancellationToken)
@@ -70,8 +73,8 @@ public class CreateTokenHandler : IRequestHandler<CreateTokenCommand, TokenDto>
 	}
 
 	private SigningCredentials GetSigningCredentials()
-	{
-		var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET"));
+    {
+		var key = Encoding.UTF8.GetBytes(_config.GetValue<string>("SECRET")!);
 		var secret = new SymmetricSecurityKey(key);
 		return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
 	}
@@ -80,7 +83,7 @@ public class CreateTokenHandler : IRequestHandler<CreateTokenCommand, TokenDto>
 	{
 		var claims = new List<Claim>
 		{
-			new (ClaimTypes.Name, user.UserName)
+			new (ClaimTypes.Name, user.UserName!)
 		};
 
 		var roles = await _userManager.GetRolesAsync(user);

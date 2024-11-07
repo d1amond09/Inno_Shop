@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace Inno_Shop.Services.UserAPI.Migrations
 {
     /// <inheritdoc />
@@ -38,7 +36,7 @@ namespace Inno_Shop.Services.UserAPI.Migrations
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                columns: ["Id", "ConcurrencyStamp", "Name", "NormalizedName"],
                 values: new object[,]
                 {
                     { "83029ce4-52d8-4648-a1d3-c2b31595d00d", null, "Administrator", "ADMINISTRATOR" },
@@ -69,7 +67,7 @@ namespace Inno_Shop.Services.UserAPI.Migrations
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                columns: ["Id", "ConcurrencyStamp", "Name", "NormalizedName"],
                 values: new object[,]
                 {
                     { "e50abc84-786c-451f-8260-541a6405de87", null, "User", "USER" },

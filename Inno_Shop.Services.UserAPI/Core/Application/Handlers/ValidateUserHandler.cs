@@ -13,8 +13,8 @@ public class ValidateUserCommandHandler(UserManager<User> userManager) :
 
 	public async Task<bool> Handle(ValidateUserCommand request, CancellationToken cancellationToken)
 	{
-		var user = await _userManager.FindByNameAsync(request.UserForAuth.UserName);
-		return (user != null && await _userManager.CheckPasswordAsync(user, request.UserForAuth.Password));
+		var user = await _userManager.FindByNameAsync(request.UserForAuth.UserName!);
+		return (user != null && await _userManager.CheckPasswordAsync(user, request.UserForAuth.Password!));
 	}
 }
 

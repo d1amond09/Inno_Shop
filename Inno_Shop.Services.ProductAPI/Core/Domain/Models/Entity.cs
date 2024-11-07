@@ -14,24 +14,23 @@ public class Entity : DynamicObject, IXmlSerializable, IDictionary<string, objec
 
     public Entity()
     {
-        _expando = new ExpandoObject();
+        _expando = new ExpandoObject()!;
     }
 
-    public override bool TryGetMember(GetMemberBinder binder, out object result)
+    public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
-        if (_expando.TryGetValue(binder.Name, out object value))
+        if (_expando.TryGetValue(binder.Name, out object? value))
         {
             result = value;
             return true;
         }
-
         return base.TryGetMember(binder, out result);
     }
 
-    public override bool TrySetMember(SetMemberBinder binder, object value)
+    public override bool TrySetMember(SetMemberBinder binder, object? value)
     {
+        ArgumentNullException.ThrowIfNull(value);
         _expando[binder.Name] = value;
-
         return true;
     }
 
@@ -47,14 +46,15 @@ public class Entity : DynamicObject, IXmlSerializable, IDictionary<string, objec
         while (!reader.Name.Equals(_root))
         {
             string typeContent;
-            Type underlyingType;
+            Type? underlyingType;
             var name = reader.Name;
 
             reader.MoveToAttribute("type");
             typeContent = reader.ReadContentAsString();
             underlyingType = Type.GetType(typeContent);
             reader.MoveToContent();
-            _expando[name] = reader.ReadElementContentAs(underlyingType, null);
+            ArgumentNullException.ThrowIfNull(underlyingType);
+            _expando[name] = reader.ReadElementContentAs(underlyingType, null!);
         }
     }
 
@@ -76,9 +76,9 @@ public class Entity : DynamicObject, IXmlSerializable, IDictionary<string, objec
             foreach (var val in (List<Link>)value)
             {
                 writer.WriteStartElement(nameof(Link));
-                WriteLinksToXml(nameof(val.Href), val.Href, writer);
-                WriteLinksToXml(nameof(val.Method), val.Method, writer);
-                WriteLinksToXml(nameof(val.Rel), val.Rel, writer);
+                WriteLinksToXml(nameof(val.Href), val.Href!, writer);
+                WriteLinksToXml(nameof(val.Method), val.Method!, writer);
+                WriteLinksToXml(nameof(val.Rel), val.Rel!, writer);
                 writer.WriteEndElement();
             }
         }
@@ -112,7 +112,7 @@ public class Entity : DynamicObject, IXmlSerializable, IDictionary<string, objec
 
     public bool TryGetValue(string key, out object value)
     {
-        return _expando.TryGetValue(key, out value);
+        return _expando.TryGetValue(key, out value!);
     }
 
     public ICollection<object> Values

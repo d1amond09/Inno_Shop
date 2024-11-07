@@ -49,7 +49,7 @@ public class DataShaper<T> : IDataShaper<T> where T : class
         }
         else
         {
-            requiredProperties = Properties.ToList();
+            requiredProperties = [.. Properties];
         }
 
         return requiredProperties;
@@ -74,10 +74,10 @@ public class DataShaper<T> : IDataShaper<T> where T : class
         foreach (var property in requiredProperties)
         {
             var objectPropertyValue = property.GetValue(entity);
-            shapedObject.Entity.TryAdd(property.Name, objectPropertyValue);
+            shapedObject.Entity!.TryAdd(property.Name, objectPropertyValue);
         }
         var objectProperty = entity.GetType().GetProperty("ProductID");
-        shapedObject.Id = (Guid)objectProperty.GetValue(entity);
+        shapedObject.Id = (Guid) objectProperty?.GetValue(entity)!;
         return shapedObject;
     }
 }

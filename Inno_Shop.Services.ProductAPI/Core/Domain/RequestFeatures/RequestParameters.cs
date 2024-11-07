@@ -9,8 +9,9 @@ namespace Inno_Shop.Services.ProductAPI.Core.Domain.RequestFeatures;
 public abstract class RequestParameters
 {
 	const int maxPageSize = 50;
-	public int PageNumber { get; set; } = 1;
 	private int _pageSize = 10;
+
+	public int PageNumber { get; set; } = 1;
 	public int PageSize
 	{
 		get
@@ -19,7 +20,8 @@ public abstract class RequestParameters
 		}
 		set
 		{
-			_pageSize = value > maxPageSize ? maxPageSize : value;
+			_pageSize = value > maxPageSize ? 
+				maxPageSize : value;
 		}
 	}
 	public string OrderBy { get; set; } = string.Empty;

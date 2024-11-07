@@ -42,26 +42,30 @@ public class Program
 		app.Run();
 	}
 	 
-	public static void ConfigureServices(IServiceCollection s, IConfiguration c)
+	public static void ConfigureServices(IServiceCollection s, IConfiguration config)
 	{
 		s.ConfigureExceptionHandler();
 		s.AddProblemDetails();
 		s.ConfigureCors();
+
 		s.ConfigureProductRepository();
-		s.ConfigureSqlContext(c);
+		s.ConfigureSqlContext(config);
 		s.ConfigureMediatR(); 
+
 		s.ConfigureAutoMapper();
 		s.ConfigureFluentValidation();
+
 		s.ConfigureResponseCaching();
 		s.ConfigureHttpCacheHeaders();
 		s.AddMemoryCache();
+
         s.AddEndpointsApiExplorer();
         s.ConfigureSwagger();
-        s.AddJwtConfiguration(c);
 
-        s.AddScoped<IDataShaper<ProductDto>, DataShaper<ProductDto>>();
-        s.AddScoped<IProductLinks, ProductLinks>();
-        s.AddScoped<ValidateMediaTypeAttribute>();
+        s.AddJwtAuthenticationConfiguration(config);
+
+        s.ConfigureDataShaping();
+		s.ConfigureHATEOAS();
 
         s.ConfigureRateLimitingOptions();
 		s.AddHttpContextAccessor();
@@ -79,32 +83,11 @@ public class Program
 			{
 				Duration = 120
 			});
-			config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
 		}).AddNewtonsoftJson()
-		.AddCustomCSVFormatter()
 		.AddXmlDataContractSerializerFormatters();
 
         s.AddCustomMediaTypes();
 
-        var jwtConfiguration = new JwtConfiguration();
-        c.Bind(jwtConfiguration.Section, jwtConfiguration);
-        var secretKey = Environment.GetEnvironmentVariable("SECRET");
-
-        s.AddAuthentication("Bearer").AddJwtBearer("Bearer", opt =>
-		{
-			opt.Authority = "https://localhost:7243";
-			opt.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-
-                ValidIssuer = jwtConfiguration.ValidIssuer,
-                ValidAudience = jwtConfiguration.ValidAudience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
-            };
-        });
 		s.AddAuthorization();
 	}
 
@@ -125,10 +108,4 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
     }
-
-    public static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() =>
-		new ServiceCollection().AddLogging().AddMvc().AddNewtonsoftJson()
-		.Services.BuildServiceProvider()
-		.GetRequiredService<IOptions<MvcOptions>>().Value.InputFormatters
-		.OfType<NewtonsoftJsonPatchInputFormatter>().First();
 }
