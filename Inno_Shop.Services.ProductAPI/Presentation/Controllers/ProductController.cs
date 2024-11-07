@@ -9,9 +9,12 @@ using Inno_Shop.Services.ProductAPI.Core.Application.Commands;
 using Inno_Shop.Services.ProductAPI.Core.Domain.RequestFeatures;
 using System.Text.Json;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Controllers;
 
+[ApiExplorerSettings(GroupName = "v1")]
+[Consumes("application/json")]
 [Route("api/products")]
 [ApiController]
 public class ProductController(ISender sender) : ApiControllerBase
@@ -28,7 +31,8 @@ public class ProductController(ISender sender) : ApiControllerBase
 		return Ok(products);
 	}
 
-	[HttpGet("{id:guid}", Name = "ProductById")]
+    [Authorize]
+    [HttpGet("{id:guid}", Name = "ProductById")]
 	public async Task<IActionResult> GetProduct(Guid id)
 	{
 		var baseResult = await _sender.Send(new GetProductQuery(id, TrackChanges: false));
@@ -40,7 +44,8 @@ public class ProductController(ISender sender) : ApiControllerBase
 		return Ok(products);
 	}
 
-	[HttpPost]
+    [Authorize]
+    [HttpPost]
 	public async Task<IActionResult> CreateProduct([FromBody] ProductForCreationDto product)
 	{
 		if (product is null)
@@ -54,7 +59,8 @@ public class ProductController(ISender sender) : ApiControllerBase
 		return CreatedAtRoute("ProductById", new { id = createdProduct.ProductID }, createdProduct);
 	}
 
-	[HttpDelete("{id:guid}")]
+    [Authorize]
+    [HttpDelete("{id:guid}")]
 	public async Task<IActionResult> DeleteProduct(Guid id)
 	{
 		var baseResult = await _sender.Send(new DeleteProductCommand(id, TrackChanges: false));
@@ -65,7 +71,8 @@ public class ProductController(ISender sender) : ApiControllerBase
 		return NoContent();
 	}
 
-	[HttpPut("{id:guid}")]
+    [Authorize]
+    [HttpPut("{id:guid}")]
 	public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductForUpdateDto product)
 	{
 		if (product is null)

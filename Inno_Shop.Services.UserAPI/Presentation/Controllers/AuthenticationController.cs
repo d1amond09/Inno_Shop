@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Inno_Shop.Services.UserAPI.Presentation.Controllers;
 
+[ApiExplorerSettings(GroupName = "v1")]
+[Consumes("application/json")]
 [Route("api/authentication")]
 [ApiController]
 public class AuthenticationController(ISender sender, UserManager<User> userManager) : ApiControllerBase

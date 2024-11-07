@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inno_Shop.Services.UserAPI.Presentation.Controllers;
 
+[ApiExplorerSettings(GroupName = "v1")]
+[Consumes("application/json")]
 [Route("api/token")]
 [ApiController]
 public class TokenController(ISender sender) : ControllerBase

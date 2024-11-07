@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Inno_Shop.Services.UserAPI.Core.Domain.ConfigurationModels;
+using Microsoft.OpenApi.Models;
 
 namespace Inno_Shop.Services.UserAPI.Presentation.Extensions;
 
@@ -90,5 +91,37 @@ public static class ServiceExtensions
 	{
         services.Configure<JwtConfiguration>("JwtSettings", configuration.GetSection("JwtSettings"));
         services.Configure<JwtConfiguration>("JwtAPI2Settings", configuration.GetSection("JwtAPI2Settings"));
+    }
+
+    public static void ConfigureSwagger(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(s =>
+        {
+            s.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "User API",
+                Version = "v1"
+            });
+            s.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+
+            s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Place to add JWT with Bearer",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            s.AddSecurityRequirement(new OpenApiSecurityRequirement() { {
+                new OpenApiSecurityScheme {
+                    Reference = new OpenApiReference {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    },
+                    Name = "Bearer",
+                },
+                new List<string>()
+            } });
+        });
     }
 }
