@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Commands;
 
-public sealed record CreateProductCommand(ProductForCreationDto Product) : 
+public sealed record CreateProductCommand(string? UserIdString, ProductForCreationDto Product) : 
 	IRequest<ApiBaseResponse>;

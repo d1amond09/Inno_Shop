@@ -14,6 +14,7 @@ using System.Dynamic;
 using Inno_Shop.Services.ProductAPI.Presentation.ActionFilters;
 using Inno_Shop.Services.ProductAPI.Core.Domain.Models;
 using Inno_Shop.Services.ProductAPI.Core.Domain.LinkModels;
+using System.Security.Claims;
 
 namespace Inno_Shop.Services.ProductAPI.Presentation.Controllers;
 
@@ -25,12 +26,16 @@ public class ProductController(ISender sender) : ApiControllerBase
 {
 	private readonly ISender _sender = sender;
 
-	[HttpGet(Name = "GetProducts")]
+	[HttpGet("all", Name = "GetProducts")]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
     public async Task<IActionResult> GetProducts([FromQuery] ProductParameters productParameters)
 	{
 		var linkParams = new LinkParameters(productParameters, HttpContext);
 		var baseResult = await _sender.Send(new GetProductsQuery(linkParams, TrackChanges: false));
+
+        if (!baseResult.Success)
+            return ProcessError(baseResult);
+
         var (linkResponse, metaData) = baseResult.GetResult<(LinkResponse, MetaData)>();
 
 		Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(metaData));
@@ -40,7 +45,6 @@ public class ProductController(ISender sender) : ApiControllerBase
 			Ok(linkResponse.ShapedEntities);
 	}
 
-    [Authorize]
     [HttpGet("{id:guid}", Name = "ProductById")]
 	public async Task<IActionResult> GetProduct(Guid id)
 	{
@@ -54,10 +58,34 @@ public class ProductController(ISender sender) : ApiControllerBase
 	}
 
     [Authorize]
+    [HttpGet(Name = "GetProductsForUser")]
+    [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
+    public async Task<IActionResult> GetProductsForUser([FromQuery] ProductParameters productParameters)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var linkParams = new LinkParameters(productParameters, HttpContext);
+        var baseResult = await _sender.Send(new GetProductsForUserQuery(userIdString, linkParams, TrackChanges: false));
+
+        if (!baseResult.Success)
+            return ProcessError(baseResult);
+
+        var (linkResponse, metaData) = baseResult.GetResult<(LinkResponse, MetaData)>();
+
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(metaData));
+
+        return linkResponse.HasLinks ?
+            Ok(linkResponse.LinkedEntities) :
+            Ok(linkResponse.ShapedEntities);
+    }
+
+    [Authorize]
     [HttpPost(Name = "CreateProduct")]
 	public async Task<IActionResult> CreateProduct([FromBody] ProductForCreationDto product)
 	{
-        var baseResult = await _sender.Send(new CreateProductCommand(product));
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var baseResult = await _sender.Send(new CreateProductCommand(userIdString, product));
 
         if (!baseResult.Success)
             return ProcessError(baseResult);
@@ -71,7 +99,9 @@ public class ProductController(ISender sender) : ApiControllerBase
     [HttpDelete("{id:guid}")]
 	public async Task<IActionResult> DeleteProduct(Guid id)
 	{
-		var baseResult = await _sender.Send(new DeleteProductCommand(id, TrackChanges: false));
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var baseResult = await _sender.Send(new DeleteProductCommand(userIdString, id, TrackChanges: false));
 		
 		if (!baseResult.Success)
 			return ProcessError(baseResult);
@@ -83,7 +113,9 @@ public class ProductController(ISender sender) : ApiControllerBase
     [HttpPut("{id:guid}")]
 	public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductForUpdateDto product)
 	{
-        var baseResult = await _sender.Send(new UpdateProductCommand(id, product, TrackChanges: true));
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var baseResult = await _sender.Send(new UpdateProductCommand(userIdString, id, product, TrackChanges: true));
 
 		if (!baseResult.Success)
 			return ProcessError(baseResult);

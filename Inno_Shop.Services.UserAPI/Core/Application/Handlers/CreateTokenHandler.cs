@@ -83,8 +83,9 @@ public class CreateTokenHandler : IRequestHandler<CreateTokenCommand, TokenDto>
 	{
 		var claims = new List<Claim>
 		{
-			new (ClaimTypes.Name, user.UserName!)
-		};
+			new (ClaimTypes.Name, user.UserName!),
+            new (ClaimTypes.NameIdentifier, user.Id)
+        };
 
 		var roles = await _userManager.GetRolesAsync(user);
 		foreach (var role in roles)

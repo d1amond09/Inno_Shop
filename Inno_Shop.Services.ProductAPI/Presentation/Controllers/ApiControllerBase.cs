@@ -20,7 +20,7 @@ public class ApiControllerBase : ControllerBase
 				Message = ((ApiBadRequestResponse)baseResponse).Message,
 				StatusCode = StatusCodes.Status400BadRequest
 			}),
-			_ => throw new NotImplementedException()
+            _ => throw new NotImplementedException()
 		};
 	}
 }

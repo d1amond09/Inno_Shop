@@ -24,7 +24,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 							  "What is, in essence, more terrible: \"consumer society\" taken " +
 							  "to the point of absurdity - or \"idea society\" taken to the " +
 							  "absolute? According to Orwell, there is and cannot be anything " +
-							  "more terrible than total lack of freedom..."
+							  "more terrible than total lack of freedom...",
+				UserID = new Guid("b4f264b9-6772-48a8-b7f9-f6dae90559b2")
 			},
 			new Product
 			{
@@ -48,8 +49,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 							  "effects to bring this magnificent Shakespearen classic vividly to life. Revealing " +
 							  "new riches with each listening, this production of \"Hamlet\" is an invaluable aid " +
 							  "for students, teachers and all true lovers of Shakespeare - a recording to be " +
-							  "treasured for decades to come."
-			},
+							  "treasured for decades to come.",
+                UserID = new Guid("b4f264b9-6772-48a8-b7f9-f6dae90559b2")
+            },
 			new Product
 			{
 				ProductID = new Guid("c9d4c053-49b1-111c-bc78-2d54a9991870"),
@@ -60,8 +62,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 				Availability = true,
 				ImageUrl = "",
 				Description = "LIGHTFORCE hybrid optical-mechanical primary switches, " +
-							  "HERO 25K gaming sensor, compatible with PC - macOS/Windows - Black"
-			}
+							  "HERO 25K gaming sensor, compatible with PC - macOS/Windows - Black",
+                UserID = new Guid("b4f264b9-6772-48a8-b7f9-f6dae90559b2")
+            }
 
 		);
 	}

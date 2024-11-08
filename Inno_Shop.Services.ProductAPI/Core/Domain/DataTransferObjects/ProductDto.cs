@@ -12,6 +12,7 @@ public record ProductDto
 	public string? CategoryName { get; init; }
 	public DateTime CreationDate { get; init; }
 	public string? ImageUrl { get; init; }
+    public Guid UserID { get; init; }
 }
 
 public record ProductForManipulationDto

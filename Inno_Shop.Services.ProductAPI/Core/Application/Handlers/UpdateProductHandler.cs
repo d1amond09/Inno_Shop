@@ -16,12 +16,18 @@ internal sealed class UpdateProductHandler(IProductRepository rep, IMapper mappe
 
 	public async Task<ApiBaseResponse> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
 	{
-		var productEntity = await _rep.GetProductByIdAsync(request.Id, request.TrackChanges);
+        if (!Guid.TryParse(request.UserIdString, out Guid userId))
+            return new ApiInvalidUserIdBadRequestResponse(request.UserIdString);
+
+        var productEntity = await _rep.GetProductByIdAsync(request.Id, request.TrackChanges);
 
 		if (productEntity is null)
 			return new ProductNotFoundResponse(request.Id);
 
-		_mapper.Map(request.Product, productEntity);
+        if (productEntity.UserID != userId)
+            return new ApiProductNotBelongUserBadRequestResponse(request.Id, userId);
+
+        _mapper.Map(request.Product, productEntity);
 		await _rep.SaveAsync();
 		return new ApiOkResponse<Product>(productEntity);
 	}

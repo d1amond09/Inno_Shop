@@ -16,9 +16,15 @@ internal sealed class CreateCompanyHandler(IProductRepository rep, IMapper mappe
 
 	public async Task<ApiBaseResponse> Handle(CreateProductCommand request, CancellationToken cancellationToken)
 	{
-		var productToCreate = _mapper.Map<Product>(request.Product);
-		_rep.CreateProduct(productToCreate);
+        if (!Guid.TryParse(request.UserIdString, out Guid userId))
+            return new ApiInvalidUserIdBadRequestResponse(request.UserIdString);
+
+        var productToCreate = _mapper.Map<Product>(request.Product);
+        productToCreate.UserID = userId;
+
+        _rep.CreateProduct(productToCreate);
 		await _rep.SaveAsync();
+
 		var productToReturn = _mapper.Map<ProductDto>(productToCreate);
         return new ApiOkResponse<ProductDto>(productToReturn);
 	}

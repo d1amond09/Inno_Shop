@@ -4,6 +4,6 @@ using MediatR;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Commands;
 
-public sealed record DeleteProductCommand
-	(Guid Id, bool TrackChanges) : IRequest<ApiBaseResponse>;
+public sealed record DeleteProductCommand(string? UserIdString, Guid Id, bool TrackChanges) : 
+    IRequest<ApiBaseResponse>;
 

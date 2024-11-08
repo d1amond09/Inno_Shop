@@ -4,6 +4,6 @@ using MediatR;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Commands;
 
-public sealed record UpdateProductCommand
-	(Guid Id, ProductForUpdateDto Product, bool TrackChanges) : IRequest<ApiBaseResponse>;
+public sealed record UpdateProductCommand (string? UserIdString, Guid Id, ProductForUpdateDto Product, bool TrackChanges) : 
+    IRequest<ApiBaseResponse>;
 

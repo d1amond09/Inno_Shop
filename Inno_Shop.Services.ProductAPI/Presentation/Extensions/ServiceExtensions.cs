@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Inno_Shop.Services.ProductAPI.Presentation.Formatters.Output;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Inno_Shop.Services.ProductAPI.Core.Application.Service;

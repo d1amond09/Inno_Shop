@@ -16,5 +16,6 @@ public class Product
 	public bool? Availability { get; set; }
 	public DateTime CreationDate { get; set; }
 	public string? ImageUrl { get; set; }
+	public Guid UserID { get; set; }
 
 }

@@ -15,12 +15,18 @@ internal sealed class DeleteProductHandler(IProductRepository rep) : IRequestHan
 
 	public async Task<ApiBaseResponse> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
 	{
-		var product = await _rep.GetProductByIdAsync(request.Id, request.TrackChanges);
+        if (!Guid.TryParse(request.UserIdString, out Guid userId))
+            return new ApiInvalidUserIdBadRequestResponse(request.UserIdString);
+
+        var product = await _rep.GetProductByIdAsync(request.Id, request.TrackChanges);
 		
 		if(product is null)
 			return new ProductNotFoundResponse(request.Id);
 
-		_rep.DeleteProduct(product);
+        if (product.UserID != userId)
+            return new ApiProductNotBelongUserBadRequestResponse(request.Id, userId);
+
+        _rep.DeleteProduct(product);
 		await _rep.SaveAsync();
 
 		return new ApiOkResponse<Product>(product);

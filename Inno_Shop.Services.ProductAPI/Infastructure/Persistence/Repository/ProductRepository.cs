@@ -40,7 +40,31 @@ public class ProductRepository(AppDbContext db) : RepositoryBase<Product>(db), I
 			productParameters.PageSize
 		);
 	}
-		
 
-	public Task SaveAsync() => _db.SaveChangesAsync();
+    public async Task<PagedList<Product>> GetProductsByUserIdAsync(
+		Guid userId,
+        ProductParameters productParameters,
+        bool trackChanges)
+    {
+        var products =
+            await FindAll(trackChanges)
+				.Where(x => x.UserID == userId)
+                .FilterProducts(productParameters.MinPrice, productParameters.MaxPrice)
+                .Search(productParameters.SearchTerm)
+                .Sort(productParameters.OrderBy)
+                .Skip((productParameters.PageNumber - 1) * productParameters.PageSize)
+                .Take(productParameters.PageSize)
+                .ToListAsync();
+
+        var count = await FindAll(trackChanges).CountAsync();
+
+        return new PagedList<Product>(
+            products,
+            count,
+            productParameters.PageNumber,
+            productParameters.PageSize
+        );
+    }
+
+    public Task SaveAsync() => _db.SaveChangesAsync();
 }

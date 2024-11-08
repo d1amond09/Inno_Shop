@@ -6,6 +6,7 @@ namespace Inno_Shop.Services.ProductAPI.Core.Application.Contracts;
 public interface IProductRepository
 {
 	Task<PagedList<Product>> GetProductsAsync(ProductParameters productParameters, bool trackChanges);
+	Task<PagedList<Product>> GetProductsByUserIdAsync(Guid userId, ProductParameters productParameters, bool trackChanges);
 	Task<Product?> GetProductByIdAsync(Guid productId, bool trackChanges);
 	void CreateProduct(Product product);
 	void DeleteProduct(Product product);
