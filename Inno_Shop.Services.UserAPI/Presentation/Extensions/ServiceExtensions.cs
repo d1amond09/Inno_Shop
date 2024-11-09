@@ -14,7 +14,7 @@ using Inno_Shop.Services.UserAPI.Core.Application.Contracts;
 using Inno_Shop.Services.UserAPI.Core.Domain.DataTransferObjects;
 using Inno_Shop.Services.UserAPI.Core.Application.Service;
 using Inno_Shop.Services.UserAPI.Core.Application.Utility;
-using Inno_Shop.Services.ProductAPI.Presentation.ActionFilters;
+using Inno_Shop.Services.UserAPI.Presentation.ActionFilters;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Marvin.Cache.Headers;
@@ -24,49 +24,49 @@ namespace Inno_Shop.Services.UserAPI.Presentation.Extensions;
 
 public static class ServiceExtensions
 {
-	public static void ConfigureCors(this IServiceCollection services) =>
-		services.AddCors(options =>
-		{
-			options.AddPolicy("CorsPolicy", builder =>
-			builder.AllowAnyOrigin()
-			.AllowAnyMethod()
-			.AllowAnyHeader());
-		});
+    public static void ConfigureCors(this IServiceCollection services) =>
+        services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy", builder =>
+            builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+        });
 
-	public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration) =>
-		services.AddDbContext<UserDbContext>(opts =>
-			opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b =>
-			{
-				b.MigrationsAssembly("Inno_Shop.Services.UserAPI");
-				b.EnableRetryOnFailure();
-			})
-		);
+    public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration) =>
+        services.AddDbContext<UserDbContext>(opts =>
+            opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b =>
+            {
+                b.MigrationsAssembly("Inno_Shop.Services.UserAPI");
+                b.EnableRetryOnFailure();
+            })
+        );
 
-	public static void ConfigureIdentity(this IServiceCollection services)
-	{
-		var builder = services.AddIdentity<User, IdentityRole>(o =>
-		{
-			o.Password.RequireDigit = true;
-			o.Password.RequireLowercase = true;
-			o.Password.RequireUppercase = true;
-			o.Password.RequireNonAlphanumeric = true;
-			o.Password.RequiredLength = 8;
-			o.User.RequireUniqueEmail = true;
-			o.SignIn.RequireConfirmedEmail = true;
-		})
-		.AddEntityFrameworkStores<UserDbContext>()
-		.AddDefaultTokenProviders();
-	}
+    public static void ConfigureIdentity(this IServiceCollection services)
+    {
+        var builder = services.AddIdentity<User, IdentityRole>(o =>
+        {
+            o.Password.RequireDigit = true;
+            o.Password.RequireLowercase = true;
+            o.Password.RequireUppercase = true;
+            o.Password.RequireNonAlphanumeric = true;
+            o.Password.RequiredLength = 8;
+            o.User.RequireUniqueEmail = true;
+            o.SignIn.RequireConfirmedEmail = true;
+        })
+        .AddEntityFrameworkStores<UserDbContext>()
+        .AddDefaultTokenProviders();
+    }
 
-	public static void ConfigureAutoMapper(this IServiceCollection services) =>
-		services.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
+    public static void ConfigureAutoMapper(this IServiceCollection services) =>
+        services.AddAutoMapper(x => x.AddProfile(new MappingProfile()));
 
-	public static void ConfigureMediatR(this IServiceCollection services) =>
-		services.AddMediatR(cfg =>
-			cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly));
+    public static void ConfigureMediatR(this IServiceCollection services) =>
+        services.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly));
 
-	public static void ConfigureExceptionHandler(this IServiceCollection services) =>
-		services.AddExceptionHandler<GlobalExceptionHandler>();
+    public static void ConfigureExceptionHandler(this IServiceCollection services) =>
+        services.AddExceptionHandler<GlobalExceptionHandler>();
 
     public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
     {
@@ -102,11 +102,13 @@ public static class ServiceExtensions
 
     public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
         services.AddHttpCacheHeaders(
-            (expirationOpt) => {
+            (expirationOpt) =>
+            {
                 expirationOpt.MaxAge = 120;
                 expirationOpt.CacheLocation = CacheLocation.Private;
             },
-            (validationOpt) => {
+            (validationOpt) =>
+            {
                 validationOpt.MustRevalidate = true;
             }
         );
@@ -121,7 +123,8 @@ public static class ServiceExtensions
             }
         ];
 
-        services.Configure<IpRateLimitOptions>(opt => {
+        services.Configure<IpRateLimitOptions>(opt =>
+        {
             opt.GeneralRules = rateLimitRules;
         });
 
@@ -132,7 +135,7 @@ public static class ServiceExtensions
     }
 
     public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
-	{
+    {
         services.Configure<JwtConfiguration>("JwtSettings", configuration.GetSection("JwtSettings"));
         services.Configure<JwtConfiguration>("JwtAPI2Settings", configuration.GetSection("JwtAPI2Settings"));
     }

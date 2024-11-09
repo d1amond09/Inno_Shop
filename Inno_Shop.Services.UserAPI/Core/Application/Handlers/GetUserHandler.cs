@@ -20,13 +20,16 @@ public class GetUserHandler(UserManager<User> userManager, IMapper mapper) :
     private readonly UserManager<User> _userManager = userManager;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<ApiBaseResponse> Handle(GetUserQuery request, CancellationToken cancellationToken)
+    public async Task<ApiBaseResponse> Handle(
+        GetUserQuery request, 
+        CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());
         if (user is null)
             return new UserNotFoundResponse(request.UserId);
 
         var userDto = _mapper.Map<UserDto>(user);
+        userDto.Roles = await _userManager.GetRolesAsync(user);
         return new ApiOkResponse<UserDto>(userDto);
     }
 }

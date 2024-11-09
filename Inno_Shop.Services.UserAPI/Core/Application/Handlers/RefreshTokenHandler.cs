@@ -8,6 +8,7 @@ using Inno_Shop.Services.UserAPI.Core.Domain.ConfigurationModels;
 using Inno_Shop.Services.UserAPI.Core.Domain.DataTransferObjects;
 using Inno_Shop.Services.UserAPI.Core.Domain.Exceptions;
 using Inno_Shop.Services.UserAPI.Core.Domain.Models;
+using Inno_Shop.Services.UserAPI.Core.Domain.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, TokenDto>
+public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, ApiBaseResponse>
 {
     private readonly IOptionsMonitor<JwtConfiguration> _configuration;
 	private readonly JwtConfiguration _jwtConfiguration;
@@ -32,14 +33,16 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, TokenDto
         _sender = sender;
     }
 
-    public async Task<TokenDto> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<ApiBaseResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
 	{
 		var principal = GetPrincipalFromExpiredToken(request.TokenDto.AccessToken);
 		var user = await _userManager.FindByNameAsync(principal.Identity?.Name!);
+		
 		if (user == null ||
 			user.RefreshToken != request.TokenDto.RefreshToken ||
 			user.RefreshTokenExpiryTime <= DateTime.Now)
-			throw new RefreshTokenBadRequest();
+			return new RefreshTokenBadRequestResponse();
+
         var tokenDto = await _sender.Send(new CreateTokenCommand(user, PopulateExp: false), cancellationToken);
         return tokenDto;
 	}
@@ -59,7 +62,11 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, TokenDto
         };
 
 		var tokenHandler = new JwtSecurityTokenHandler();
-		var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+		var principal = tokenHandler
+			.ValidateToken(
+				token, 
+				tokenValidationParameters, 
+				out SecurityToken securityToken);
 
 		if (securityToken is not JwtSecurityToken jwtSecurityToken ||
 			!jwtSecurityToken.Header.Alg.Equals(

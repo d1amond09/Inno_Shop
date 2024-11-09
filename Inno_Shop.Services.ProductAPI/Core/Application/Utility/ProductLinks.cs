@@ -48,9 +48,9 @@ public class ProductLinks(LinkGenerator linkGenerator, IDataShaper<ProductDto> d
         }
 
         var productCollection = new LinkCollectionWrapper<Entity>(shapedProducts);
-        var linkedEmployees = CreateLinksForProducts(httpContext, productCollection);
+        var linkedProducts = CreateLinksForProducts(httpContext, productCollection);
 
-        return new LinkResponse { HasLinks = true, LinkedEntities = linkedEmployees };
+        return new LinkResponse { HasLinks = true, LinkedEntities = linkedProducts };
     }
 
     private List<Link> CreateLinksForProducts(HttpContext httpContext, Guid id, string fields = "")
@@ -63,9 +63,9 @@ public class ProductLinks(LinkGenerator linkGenerator, IDataShaper<ProductDto> d
 
         return links;
     }
-    private LinkCollectionWrapper<Entity> CreateLinksForProducts(HttpContext httpContext, LinkCollectionWrapper<Entity> employeesWrapper)
+    private LinkCollectionWrapper<Entity> CreateLinksForProducts(HttpContext httpContext, LinkCollectionWrapper<Entity> productsWrapper)
     {
-        employeesWrapper.Links.Add(new Link(_linkGenerator.GetUriByAction(httpContext, "GetProduct", values: new { })!, "self", "GET"));
-        return employeesWrapper;
+        productsWrapper.Links.Add(new Link(_linkGenerator.GetUriByAction(httpContext, "GetProduct", values: new { })!, "self", "GET"));
+        return productsWrapper;
     }
 }

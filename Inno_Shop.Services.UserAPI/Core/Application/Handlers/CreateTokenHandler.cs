@@ -8,6 +8,7 @@ using Inno_Shop.Services.UserAPI.Core.Application.Commands;
 using Inno_Shop.Services.UserAPI.Core.Domain.ConfigurationModels;
 using Inno_Shop.Services.UserAPI.Core.Domain.DataTransferObjects;
 using Inno_Shop.Services.UserAPI.Core.Domain.Models;
+using Inno_Shop.Services.UserAPI.Core.Domain.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -16,14 +17,18 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-public class CreateTokenHandler : IRequestHandler<CreateTokenCommand, TokenDto>
+public class CreateTokenHandler : 
+	IRequestHandler<CreateTokenCommand, ApiBaseResponse>
 {
     private readonly IOptionsMonitor<JwtConfiguration> _configuration;
 	private readonly JwtConfiguration _jwtConfiguration;
 	private readonly UserManager<User> _userManager;
     private readonly IConfiguration _config;
 
-    public CreateTokenHandler(UserManager<User> userManager, IOptionsMonitor<JwtConfiguration> configuration, IConfiguration config)
+    public CreateTokenHandler(
+		UserManager<User> userManager, 
+		IOptionsMonitor<JwtConfiguration> configuration, 
+		IConfiguration config)
     {
         _userManager = userManager;
         _configuration = configuration;
@@ -31,7 +36,9 @@ public class CreateTokenHandler : IRequestHandler<CreateTokenCommand, TokenDto>
 		_config = config;
     }
 
-    public async Task<TokenDto> Handle(CreateTokenCommand request, CancellationToken cancellationToken)
+    public async Task<ApiBaseResponse> Handle(
+		CreateTokenCommand request, 
+		CancellationToken cancellationToken)
 	{
 		var signingCredentials = GetSigningCredentials();
 		var claims = await GetClaims(request.User);
@@ -47,9 +54,10 @@ public class CreateTokenHandler : IRequestHandler<CreateTokenCommand, TokenDto>
 		await _userManager.UpdateAsync(request.User);
 
 		var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+		var tokenDto = new TokenDto(accessToken, refreshToken);
 
-		return new TokenDto(accessToken, refreshToken);
-	}
+		return new ApiOkResponse<TokenDto>(tokenDto);
+    }
 
 	private string GenerateRefreshToken()
 	{
@@ -59,13 +67,16 @@ public class CreateTokenHandler : IRequestHandler<CreateTokenCommand, TokenDto>
 		return Convert.ToBase64String(randomNumber);
 	}
 
-	private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
+	private JwtSecurityToken GenerateTokenOptions(
+		SigningCredentials signingCredentials, 
+		List<Claim> claims)
 	{
 		var tokenOptions = new JwtSecurityToken(
             issuer: _jwtConfiguration.ValidIssuer,
 			audience: _jwtConfiguration.ValidAudience,
 			claims: claims,
-			expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtConfiguration.Expires)),
+			expires: DateTime.Now
+				.AddMinutes(Convert.ToDouble(_jwtConfiguration.Expires)),
 			signingCredentials: signingCredentials
         );
 

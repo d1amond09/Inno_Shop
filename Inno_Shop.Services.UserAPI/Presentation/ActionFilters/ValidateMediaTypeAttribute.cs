@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
-namespace Inno_Shop.Services.ProductAPI.Presentation.ActionFilters;
+namespace Inno_Shop.Services.UserAPI.Presentation.ActionFilters;
 
 public class ValidateMediaTypeAttribute : IActionFilter
 {

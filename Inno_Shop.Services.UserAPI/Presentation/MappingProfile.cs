@@ -7,21 +7,10 @@ namespace Inno_Shop.Services.UserAPI.Presentation;
 
 public class MappingProfile : Profile
 {
-	private readonly UserManager<User> _userManager;
-    public MappingProfile(UserManager<User> userManager)
+    public MappingProfile()
 	{
-        _userManager = userManager;
-
-        CreateMap<User, UserDto>()
-			.ForMember(x => x.Roles, opt => 
-				opt.MapFrom(x => GetRolesAsync(x))
-			);
+		CreateMap<User, UserDto>();
 		CreateMap<UserForUpdateDto, User>();
 		CreateMap<UserForRegistrationDto, User>();
 	}
-
-	private async Task<ICollection<string>> GetRolesAsync(User user)
-	{
-		return await _userManager.GetRolesAsync(user);
-    }
 }

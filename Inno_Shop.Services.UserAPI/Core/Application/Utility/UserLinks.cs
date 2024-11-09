@@ -32,12 +32,16 @@ public class UserLinks(LinkGenerator linkGenerator, IDataShaper<UserDto> dataSha
 
     private bool ShouldGenerateLinks(HttpContext httpContext)
     {
-        var mediaType = (MediaTypeHeaderValue?) httpContext.Items["AcceptHeaderMediaType"];
+        var mediaType = (MediaTypeHeaderValue?)httpContext.Items["AcceptHeaderMediaType"];
         ArgumentNullException.ThrowIfNull(mediaType);
         return mediaType.SubTypeWithoutSuffix
             .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
     }
-    private LinkResponse ReturnLinkdedUsers(IEnumerable<UserDto> usersDto, string fields, HttpContext httpContext, List<Entity> shapedUsers)
+    private LinkResponse ReturnLinkdedUsers(
+        IEnumerable<UserDto> usersDto, 
+        string fields, 
+        HttpContext httpContext, 
+        List<Entity> shapedUsers)
     {
         var UserDtoList = usersDto.ToList();
 
@@ -53,7 +57,10 @@ public class UserLinks(LinkGenerator linkGenerator, IDataShaper<UserDto> dataSha
         return new LinkResponse { HasLinks = true, LinkedEntities = linkedEmployees };
     }
 
-    private List<Link> CreateLinksForUsers(HttpContext httpContext, Guid id, string fields = "")
+    private List<Link> CreateLinksForUsers(
+        HttpContext httpContext, 
+        Guid id, 
+        string fields = "")
     {
         List<Link> links = [
             new Link(_linkGenerator.GetUriByAction(httpContext, "GetUser", values: new { id, fields })!, "self", "GET"),
@@ -63,9 +70,11 @@ public class UserLinks(LinkGenerator linkGenerator, IDataShaper<UserDto> dataSha
 
         return links;
     }
-    private LinkCollectionWrapper<Entity> CreateLinksForUsers(HttpContext httpContext, LinkCollectionWrapper<Entity> employeesWrapper)
+    private LinkCollectionWrapper<Entity> CreateLinksForUsers(
+        HttpContext httpContext, 
+        LinkCollectionWrapper<Entity> usersWrapper)
     {
-        employeesWrapper.Links.Add(new Link(_linkGenerator.GetUriByAction(httpContext, "GetUser", values: new { })!, "self", "GET"));
-        return employeesWrapper;
+        usersWrapper.Links.Add(new Link(_linkGenerator.GetUriByAction(httpContext, "GetUser", values: new { })!, "self", "GET"));
+        return usersWrapper;
     }
 }

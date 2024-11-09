@@ -14,14 +14,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-public class GetUsersHandler(UserManager<User> userManager, IMapper mapper, IUserLinks userLinks) :
+public class GetUsersHandler
+    (UserManager<User> userManager, IMapper mapper, IUserLinks userLinks) :
     IRequestHandler<GetUsersQuery, ApiBaseResponse>
 {
     private readonly UserManager<User> _userManager = userManager;
     private readonly IMapper _mapper = mapper;
     private readonly IUserLinks _userLinks = userLinks;
 
-    public async Task<ApiBaseResponse> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+    public async Task<ApiBaseResponse> Handle(
+        GetUsersQuery request, 
+        CancellationToken cancellationToken)
     {
         var users = await _userManager.Users
             .Sort(request.LinkParameters.UserParameters.OrderBy)
@@ -40,6 +43,11 @@ public class GetUsersHandler(UserManager<User> userManager, IMapper mapper, IUse
         );
 
         var usersDto = _mapper.Map<IEnumerable<UserDto>>(usersWithMetaData);
+
+        for(int i = 0; i < usersDto.Count(); i++)
+        {
+            usersDto.ElementAt(i).Roles = await _userManager.GetRolesAsync(users[i]);
+        }
 
         var links = _userLinks.TryGenerateLinks(
             usersDto,

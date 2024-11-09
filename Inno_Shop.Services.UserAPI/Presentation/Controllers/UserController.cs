@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
-using Inno_Shop.Services.ProductAPI.Presentation.ActionFilters;
+using Inno_Shop.Services.UserAPI.Presentation.ActionFilters;
 using Inno_Shop.Services.UserAPI.Core.Application.Commands;
 using Inno_Shop.Services.UserAPI.Core.Application.Queries;
 using Inno_Shop.Services.UserAPI.Core.Domain.DataTransferObjects;
@@ -59,7 +59,7 @@ public class UserController(ISender sender, UserManager<User> userManager) : Api
     }
 
     [Authorize(Roles = "Administrator")]
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{id:guid}", Name = "DeleteUser")]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
         var baseResult = await _sender.Send(new DeleteUserCommand(id));
@@ -71,7 +71,7 @@ public class UserController(ISender sender, UserManager<User> userManager) : Api
     }
 
     [Authorize(Roles = "Administrator")]
-    [HttpPut("{id:guid}")]
+    [HttpPut("{id:guid}", Name = "UpdateUser")]
     public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserForUpdateDto user)
     {
         var baseResult = await _sender.Send(new UpdateUserCommand(id, user));

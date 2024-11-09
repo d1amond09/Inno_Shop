@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-internal sealed class DeleteUserHandler(UserManager<User> userManager) : IRequestHandler<DeleteUserCommand, ApiBaseResponse>
+internal sealed class DeleteUserHandler(UserManager<User> userManager) : 
+	IRequestHandler<DeleteUserCommand, ApiBaseResponse>
 {
     private readonly UserManager<User> _userManager = userManager;
 
-    public async Task<ApiBaseResponse> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+    public async Task<ApiBaseResponse> Handle(
+		DeleteUserCommand request, 
+		CancellationToken cancellationToken)
 	{
         var user = await _userManager.FindByIdAsync(request.Id.ToString());
 		

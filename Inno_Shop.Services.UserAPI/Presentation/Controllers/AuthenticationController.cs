@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Inno_Shop.Services.UserAPI.Core.Domain.Models;
 using Microsoft.AspNetCore.Identity;
+using Inno_Shop.Services.UserAPI.Presentation.Extensions;
 
 namespace Inno_Shop.Services.UserAPI.Presentation.Controllers;
 
@@ -17,10 +18,15 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
 	private readonly ISender _sender = sender;
 	private readonly UserManager<User> _userManager = userManager;
 
-	[HttpPost]
-	public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
+	[HttpPost(Name = "SignUp")]
+    public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
 	{
-		var result = await _sender.Send(new RegisterUserCommand(userForRegistration));
+        var baseResult = await _sender.Send(new RegisterUserCommand(userForRegistration));
+
+        if (!baseResult.Success)
+            return ProcessError(baseResult);
+
+        var result = baseResult.GetResult<IdentityResult>();
 
 		if (!result.Succeeded)
 		{
@@ -33,26 +39,32 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
 		return StatusCode(201);
 	}
 
-	[HttpPost("login")]
-	public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userForAuth)
+	[HttpPost("login", Name = "SignIn")]
+    public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userForAuth)
 	{
-		var isValidUser = await _sender.Send(new ValidateUserCommand(userForAuth));
+		var baseResult = await _sender.Send(new ValidateUserCommand(userForAuth));
 
-		if (!isValidUser)
-		{
+        if (!baseResult.Success)
+            return ProcessError(baseResult);
+
+		var isValidUser = baseResult.GetResult<bool>();
+
+        if (!isValidUser)
 			return Unauthorized("Invalid username or password.");
-		}
 
 		var user = await _userManager.FindByNameAsync(userForAuth.UserName!);
+
 		if (user == null)
-		{
 			return Unauthorized("Invalid username or password.");
-		}
 
-		var tokenDto = await _sender.Send(new CreateTokenCommand(user, PopulateExp: true));
+		var tokenDtoBaseResult = await _sender.Send(new CreateTokenCommand(user, PopulateExp: true));
 
-		return Ok(tokenDto);
+        if (!tokenDtoBaseResult.Success)
+            return ProcessError(tokenDtoBaseResult);
 
+		var tokenDto = tokenDtoBaseResult.GetResult<TokenDto>();
+
+        return Ok(tokenDto);
 	}
 }
 

@@ -57,6 +57,7 @@ public class Program
         s.ConfigureDataShaping();
         s.ConfigureHATEOAS();
 
+
         s.Configure<ApiBehaviorOptions>(options =>
         {
             options.SuppressModelStateInvalidFilter = true;
