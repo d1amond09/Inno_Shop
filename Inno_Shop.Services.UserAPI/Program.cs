@@ -1,5 +1,9 @@
 using AspNetCoreRateLimit;
+using Inno_Shop.Services.UserAPI.Core.Application.Contracts;
+using Inno_Shop.Services.UserAPI.Core.Application.Service;
+using Inno_Shop.Services.UserAPI.Core.Domain.ConfigurationModels;
 using Inno_Shop.Services.UserAPI.Presentation.Extensions;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -57,7 +61,6 @@ public class Program
         s.ConfigureDataShaping();
         s.ConfigureHATEOAS();
 
-
         s.Configure<ApiBehaviorOptions>(options =>
         {
             options.SuppressModelStateInvalidFilter = true;
@@ -75,6 +78,7 @@ public class Program
         .AddXmlDataContractSerializerFormatters();
 
         s.AddCustomMediaTypes();
+        s.ConfigureEmailSending(config);
     }
 
 	public static void ConfigureApp(IApplicationBuilder app)

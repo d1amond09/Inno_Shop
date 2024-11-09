@@ -19,6 +19,9 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Marvin.Cache.Headers;
 using AspNetCoreRateLimit;
+using Inno_Shop.Services.UserAPI.Presentation.CustomTokenProviders;
+using Microsoft.AspNetCore.Http.Features;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Inno_Shop.Services.UserAPI.Presentation.Extensions;
 
@@ -53,9 +56,17 @@ public static class ServiceExtensions
             o.Password.RequiredLength = 8;
             o.User.RequireUniqueEmail = true;
             o.SignIn.RequireConfirmedEmail = true;
+            o.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
         })
         .AddEntityFrameworkStores<UserDbContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders()
+        .AddTokenProvider<EmailConfirmationTokenProvider<User>>("emailconfirmation");
+
+        services.Configure<DataProtectionTokenProviderOptions>(opt =>
+            opt.TokenLifespan = TimeSpan.FromHours(2));
+
+        services.Configure<EmailConfirmationTokenProviderOptions>(opt =>
+            opt.TokenLifespan = TimeSpan.FromDays(3));
     }
 
     public static void ConfigureAutoMapper(this IServiceCollection services) =>
@@ -203,5 +214,22 @@ public static class ServiceExtensions
     {
         services.AddScoped<IUserLinks, UserLinks>();
         services.AddScoped<ValidateMediaTypeAttribute>();
+    }
+
+    public static void ConfigureEmailSending(this IServiceCollection services, IConfiguration config)
+    {
+        EmailConfiguration? emailConfig = config
+            .GetSection("EmailConfiguration")
+            .Get<EmailConfiguration>();
+        ArgumentNullException.ThrowIfNull(emailConfig);
+        services.AddSingleton(emailConfig);
+
+        services.AddScoped<IEmailSender, EmailSender>();
+
+        services.Configure<FormOptions>(o => {
+            o.ValueLengthLimit = int.MaxValue;
+            o.MultipartBodyLengthLimit = int.MaxValue;
+            o.MemoryBufferThreshold = int.MaxValue;
+        });
     }
 }

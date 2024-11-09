@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using Inno_Shop.Services.UserAPI.Core.Application.Commands;
 using Inno_Shop.Services.UserAPI.Core.Domain.Models;
 using Inno_Shop.Services.UserAPI.Core.Domain.Responses;
@@ -19,13 +20,15 @@ internal sealed class RegisterUserCommandHandler
 		CancellationToken cancellationToken)
 	{
 		var user = _mapper.Map<User>(request.UserForRegistrationDto);
-		var result = await _userManager
+		var identityResult = await _userManager
 			.CreateAsync(user, request.UserForRegistrationDto.Password!);
 		
-		if (result.Succeeded)
+		if (identityResult.Succeeded)
 			await _userManager
 				.AddToRolesAsync(user, request.UserForRegistrationDto.Roles!);
 
-		return new ApiOkResponse<IdentityResult>(result);
+        (IdentityResult, User) result = new (identityResult, user);
+
+        return new ApiOkResponse<(IdentityResult, User)>(result);
 	}
 }
