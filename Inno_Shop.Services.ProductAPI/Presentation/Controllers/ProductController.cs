@@ -45,7 +45,7 @@ public class ProductController(ISender sender) : ApiControllerBase
 			Ok(linkResponse.ShapedEntities);
 	}
 
-    [HttpGet("{id:guid}", Name = "ProductById")]
+    [HttpGet("{id:guid}", Name = "GetProduct")]
 	public async Task<IActionResult> GetProduct(Guid id)
 	{
 		var baseResult = await _sender.Send(new GetProductQuery(id, TrackChanges: false));

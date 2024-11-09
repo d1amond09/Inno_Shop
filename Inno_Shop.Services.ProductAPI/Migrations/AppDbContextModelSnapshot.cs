@@ -56,7 +56,7 @@ namespace Inno_Shop.Services.ProductAPI.Migrations
 
                     b.HasKey("ProductID");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
 
                     b.HasData(
                         new

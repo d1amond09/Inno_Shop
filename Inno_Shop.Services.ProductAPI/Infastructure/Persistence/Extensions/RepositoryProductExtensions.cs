@@ -17,11 +17,8 @@ public static class RepositoryProductExtensions
 			return products;
 
 		var lowerCaseTerm = searchTerm.Trim().ToLower();
-		return products
-			.Where(e => e.Name!.Contains(
-				lowerCaseTerm, StringComparison.CurrentCultureIgnoreCase
-			));
-	}
+        return products.Where(e => e.Name!.ToLower().Contains(lowerCaseTerm));
+    }
 
 	public static IQueryable<Product> Sort(this IQueryable<Product> products, string orderByQueryString)
 	{

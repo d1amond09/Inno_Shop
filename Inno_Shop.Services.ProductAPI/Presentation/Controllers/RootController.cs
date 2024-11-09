@@ -17,23 +17,23 @@ public class RootController(LinkGenerator linkGenerator) : ControllerBase
         if (mediaType.Contains("application/apiroot"))
         {
             List<Link> list =
-        [
-            new Link {
-                Href = _linkGenerator.GetUriByName(HttpContext, nameof(GetRoot), new{}),
-                Rel = "self",
-                Method = "GET"
-            },
-            new Link {
-                Href = _linkGenerator.GetUriByName(HttpContext, "GetProducts", new{}),
-                Rel = "products",
-                Method = "GET"
-            },
-            new Link {
-                Href = _linkGenerator.GetUriByName(HttpContext, "CreateProduct", new{}),
-                Rel = "create_product",
-                Method = "POST"
-            }
-        ];
+            [
+                new Link {
+                    Href = _linkGenerator.GetUriByName(HttpContext, nameof(GetRoot), new{}),
+                    Rel = "self",
+                    Method = "GET"
+                },
+                new Link {
+                    Href = _linkGenerator.GetUriByName(HttpContext, "GetProducts", new{}),
+                    Rel = "products",
+                    Method = "GET"
+                },
+                new Link {
+                    Href = _linkGenerator.GetUriByName(HttpContext, "CreateProduct", new{}),
+                    Rel = "create_product",
+                    Method = "POST"
+                }
+            ];
 
             return Ok(list);
         }

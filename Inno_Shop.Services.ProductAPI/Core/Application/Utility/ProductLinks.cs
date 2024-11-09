@@ -22,8 +22,8 @@ public class ProductLinks(LinkGenerator linkGenerator, IDataShaper<ProductDto> d
         return ReturnShapedProducts(shapedProducts);
     }
 
-    private LinkResponse ReturnShapedProducts(List<Entity> shapedEmployees) =>
-        new() { ShapedEntities = shapedEmployees };
+    private LinkResponse ReturnShapedProducts(List<Entity> shapedProducts) =>
+        new() { ShapedEntities = shapedProducts };
 
     private List<Entity> ShapeData(IEnumerable<ProductDto> productsDto, string fields) =>
         _dataShaper.ShapeData(productsDto, fields)
@@ -47,8 +47,8 @@ public class ProductLinks(LinkGenerator linkGenerator, IDataShaper<ProductDto> d
             shapedProducts[index].Add("Links", productLinks);
         }
 
-        var employeeCollection = new LinkCollectionWrapper<Entity>(shapedProducts);
-        var linkedEmployees = CreateLinksForProducts(httpContext, employeeCollection);
+        var productCollection = new LinkCollectionWrapper<Entity>(shapedProducts);
+        var linkedEmployees = CreateLinksForProducts(httpContext, productCollection);
 
         return new LinkResponse { HasLinks = true, LinkedEntities = linkedEmployees };
     }
@@ -57,8 +57,8 @@ public class ProductLinks(LinkGenerator linkGenerator, IDataShaper<ProductDto> d
     {
         List<Link> links = [
             new Link(_linkGenerator.GetUriByAction(httpContext, "GetProduct", values: new { id, fields })!, "self", "GET"),
-            new Link(_linkGenerator.GetUriByAction(httpContext, "DeleteProduct", values: new { id })!, "delete_employee", "DELETE"),
-            new Link(_linkGenerator.GetUriByAction(httpContext, "UpdateProduct", values: new { id })!, "update_employee", "PUT")
+            new Link(_linkGenerator.GetUriByAction(httpContext, "DeleteProduct", values: new { id })!, "delete_product", "DELETE"),
+            new Link(_linkGenerator.GetUriByAction(httpContext, "UpdateProduct", values: new { id })!, "update_product", "PUT")
         ];
 
         return links;

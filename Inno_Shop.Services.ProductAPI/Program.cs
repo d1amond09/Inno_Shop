@@ -70,11 +70,6 @@ public class Program
         s.ConfigureRateLimitingOptions();
 		s.AddHttpContextAccessor();
 
-		s.Configure<ApiBehaviorOptions>(options =>
-		{
-			options.SuppressModelStateInvalidFilter = true;
-		});
-
 		s.AddControllers(config =>
 		{
 			config.RespectBrowserAcceptHeader = true;

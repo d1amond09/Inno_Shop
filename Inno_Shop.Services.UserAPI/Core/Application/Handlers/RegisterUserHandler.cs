@@ -18,6 +18,7 @@ internal sealed class RegisterUserCommandHandler(IMapper mapper, UserManager<Use
 		var result = await _userManager.CreateAsync(user, request.UserForRegistrationDto.Password!);
 		if (result.Succeeded)
 			await _userManager.AddToRolesAsync(user, request.UserForRegistrationDto.Roles!);
+
 		return result;
 	}
 }

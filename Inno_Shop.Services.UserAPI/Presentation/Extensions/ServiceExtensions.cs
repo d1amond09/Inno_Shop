@@ -10,6 +10,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Inno_Shop.Services.UserAPI.Core.Domain.ConfigurationModels;
 using Microsoft.OpenApi.Models;
+using Inno_Shop.Services.UserAPI.Core.Application.Contracts;
+using Inno_Shop.Services.UserAPI.Core.Domain.DataTransferObjects;
+using Inno_Shop.Services.UserAPI.Core.Application.Service;
+using Inno_Shop.Services.UserAPI.Core.Application.Utility;
+using Inno_Shop.Services.ProductAPI.Presentation.ActionFilters;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc;
+using Marvin.Cache.Headers;
+using AspNetCoreRateLimit;
 
 namespace Inno_Shop.Services.UserAPI.Presentation.Extensions;
 
@@ -88,6 +97,40 @@ public static class ServiceExtensions
         });
     }
 
+    public static void ConfigureResponseCaching(this IServiceCollection services) =>
+        services.AddResponseCaching();
+
+    public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
+        services.AddHttpCacheHeaders(
+            (expirationOpt) => {
+                expirationOpt.MaxAge = 120;
+                expirationOpt.CacheLocation = CacheLocation.Private;
+            },
+            (validationOpt) => {
+                validationOpt.MustRevalidate = true;
+            }
+        );
+
+    public static void ConfigureRateLimitingOptions(this IServiceCollection services)
+    {
+        List<RateLimitRule> rateLimitRules = [
+            new() {
+                Endpoint = "*",
+                Limit = 10,
+                Period = "1s"
+            }
+        ];
+
+        services.Configure<IpRateLimitOptions>(opt => {
+            opt.GeneralRules = rateLimitRules;
+        });
+
+        services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+        services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+        services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+        services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+    }
+
     public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
 	{
         services.Configure<JwtConfiguration>("JwtSettings", configuration.GetSection("JwtSettings"));
@@ -124,5 +167,38 @@ public static class ServiceExtensions
                 new List<string>()
             } });
         });
+    }
+
+    public static void AddCustomMediaTypes(this IServiceCollection services)
+    {
+        services.Configure<MvcOptions>(config =>
+        {
+            var newtonsoftJsonOutputFormatter = config.OutputFormatters
+                .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+
+            newtonsoftJsonOutputFormatter?.SupportedMediaTypes
+                .Add("application/hateoas+json");
+
+            newtonsoftJsonOutputFormatter?.SupportedMediaTypes
+                .Add("application/apiroot+json");
+
+            var xmlOutputFormatter = config.OutputFormatters
+                .OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
+
+            xmlOutputFormatter?.SupportedMediaTypes
+                .Add("application/hateoas+xml");
+
+            xmlOutputFormatter?.SupportedMediaTypes
+                .Add("application/apiroot+xml");
+        });
+    }
+
+    public static void ConfigureDataShaping(this IServiceCollection services) =>
+       services.AddScoped<IDataShaper<UserDto>, DataShaper<UserDto>>();
+
+    public static void ConfigureHATEOAS(this IServiceCollection services)
+    {
+        services.AddScoped<IUserLinks, UserLinks>();
+        services.AddScoped<ValidateMediaTypeAttribute>();
     }
 }
