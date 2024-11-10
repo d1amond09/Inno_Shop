@@ -140,7 +140,7 @@ public static class ServiceExtensions
 
         services.AddAuthentication("Bearer").AddJwtBearer("Bearer", opt =>
         {
-            opt.Authority = "https://localhost:7243";
+            opt.Authority = jwtConfiguration.ValidAudience;
             opt.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,

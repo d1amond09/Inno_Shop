@@ -1,0 +1,41 @@
+version: '3.2'
+
+networks:
+  innoshopapp:
+    driver: bridge
+
+volumes:
+  sql_data:
+
+services:
+  innoshopdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA="Y"
+      - MSSQL_SA_PASSWORD=NewPa55w@rd2022
+    ports:
+      - "8001:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - innoshopapp
+
+  inno_shop.services.userapi:
+    image: ${DOCKER_REGISTRY-}innoshopservicesuserapi
+    build:
+      context: .
+      dockerfile: Inno_Shop.Services.UserAPI/Dockerfile
+    depends_on:
+      - innoshopdb
+    networks:
+      - innoshopapp
+
+  inno_shop.services.productapi:
+    image: ${DOCKER_REGISTRY-}innoshopservicesproductapi
+    build:
+      context: .
+      dockerfile: Inno_Shop.Services.ProductAPI/Dockerfile  
+    depends_on:
+      - innoshopdb
+    networks:
+      - innoshopapp

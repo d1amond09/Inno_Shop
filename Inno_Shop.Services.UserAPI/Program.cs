@@ -6,6 +6,7 @@ using Inno_Shop.Services.UserAPI.Presentation.Extensions;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 
 namespace Inno_Shop.Services.UserAPI;
@@ -30,9 +31,9 @@ public class Program
 
         app.UseHttpsRedirection();
 
-		app.MapControllers();
+        app.MapControllers();
 
-		app.Run();
+        app.Run();
 	}
 
 	public static void ConfigureServices(IServiceCollection s, IConfiguration config)

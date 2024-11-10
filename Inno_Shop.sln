@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inno_Shop.Services.ProductA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inno_Shop.Services.UserAPI", "Inno_Shop.Services.UserAPI\Inno_Shop.Services.UserAPI.csproj", "{588E33DC-6D8A-416B-B759-7E4BDF88CD5C}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{5CF37DCB-1193-48DB-AAC4-49B989A352F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{588E33DC-6D8A-416B-B759-7E4BDF88CD5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{588E33DC-6D8A-416B-B759-7E4BDF88CD5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{588E33DC-6D8A-416B-B759-7E4BDF88CD5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CF37DCB-1193-48DB-AAC4-49B989A352F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CF37DCB-1193-48DB-AAC4-49B989A352F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CF37DCB-1193-48DB-AAC4-49B989A352F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CF37DCB-1193-48DB-AAC4-49B989A352F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
