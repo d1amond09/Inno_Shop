@@ -5,11 +5,10 @@ using Inno_Shop.Services.ProductAPI.Core.Domain.Responses;
 using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
 using Inno_Shop.Services.ProductAPI.Domain.Models;
 using MediatR;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Handlers;
 
-internal sealed class CreateCompanyHandler(IProductRepository rep, IMapper mapper) : IRequestHandler<CreateProductCommand, ApiBaseResponse>
+public sealed class CreateProductHandler(IProductRepository rep, IMapper mapper) : IRequestHandler<CreateProductCommand, ApiBaseResponse>
 {
 	private readonly IProductRepository _rep = rep;
 	private readonly IMapper _mapper = mapper;

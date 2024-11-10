@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Handlers;
 
-internal sealed class UpdateProductHandler(IProductRepository rep, IMapper mapper) : IRequestHandler<UpdateProductCommand, ApiBaseResponse>
+public sealed class UpdateProductHandler(IProductRepository rep, IMapper mapper) : IRequestHandler<UpdateProductCommand, ApiBaseResponse>
 {
 	private readonly IProductRepository _rep = rep;
 	private readonly IMapper _mapper = mapper;

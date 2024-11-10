@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Inno_Shop.Services.ProductAPI.Core.Application.Handlers;
 
-internal sealed class DeleteProductHandler(IProductRepository rep) : IRequestHandler<DeleteProductCommand, ApiBaseResponse>
+public sealed class DeleteProductHandler(IProductRepository rep) : IRequestHandler<DeleteProductCommand, ApiBaseResponse>
 {
 	private readonly IProductRepository _rep = rep;
 
