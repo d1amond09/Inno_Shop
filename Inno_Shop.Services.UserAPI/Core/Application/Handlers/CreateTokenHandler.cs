@@ -83,12 +83,18 @@ public class CreateTokenHandler :
 		return tokenOptions;
 	}
 
-	private SigningCredentials GetSigningCredentials()
+    private SigningCredentials GetSigningCredentials()
     {
-		var key = Encoding.UTF8.GetBytes(_config.GetValue<string>("SECRET")!);
-		var secret = new SymmetricSecurityKey(key);
-		return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-	}
+        var secretValue = _config["SECRET"];
+        if (string.IsNullOrEmpty(secretValue))
+        {
+            throw new InvalidOperationException("The SECRET configuration value is missing.");
+        }
+
+        var key = Encoding.UTF8.GetBytes(secretValue);
+        var secret = new SymmetricSecurityKey(key);
+        return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+    }
 
 	private async Task<List<Claim>> GetClaims(User user)
 	{

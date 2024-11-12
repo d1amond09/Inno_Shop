@@ -11,7 +11,7 @@ using Inno_Shop.Services.ProductAPI.Core.Domain.Responses;
 using Inno_Shop.Services.ProductAPI.Domain.Models;
 using Inno_Shop.Services.ProductAPI.Core.Domain.Exceptions;
 
-namespace Inno_Shop.Services.ProductAPI.Tests;
+namespace Inno_Shop.Services.ProductAPI.Tests.Handlers;
 
 public class DeleteProductHandlerTests
 {

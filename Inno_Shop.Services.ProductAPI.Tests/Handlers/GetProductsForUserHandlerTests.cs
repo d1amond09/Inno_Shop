@@ -17,7 +17,7 @@ using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 using Microsoft.AspNetCore.Http;
 using Moq;
 
-namespace Inno_Shop.Services.ProductAPI.Tests;
+namespace Inno_Shop.Services.ProductAPI.Tests.Handlers;
 
 public class GetProductsForUserHandlerTests
 {

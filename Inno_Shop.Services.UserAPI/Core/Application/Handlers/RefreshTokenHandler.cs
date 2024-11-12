@@ -49,13 +49,19 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, ApiBaseR
 
 	public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
 	{
-		var tokenValidationParameters = new TokenValidationParameters
+        var secretValue = _config["SECRET"];
+        if (string.IsNullOrEmpty(secretValue))
+        {
+            throw new InvalidOperationException("The SECRET configuration value is missing.");
+        }
+
+        var tokenValidationParameters = new TokenValidationParameters
 		{
 			ValidateAudience = true,
 			ValidateIssuer = true,
 			ValidateIssuerSigningKey = true,
 			IssuerSigningKey = new SymmetricSecurityKey(
-				Encoding.UTF8.GetBytes(_config.GetValue<string>("SECRET")!)),
+				Encoding.UTF8.GetBytes(secretValue)),
 			ValidateLifetime = true,
             ValidIssuer = _jwtConfiguration.ValidIssuer,
             ValidAudience = _jwtConfiguration.ValidAudience

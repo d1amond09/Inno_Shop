@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-internal sealed class RegisterUserCommandHandler
+public sealed class RegisterUserCommandHandler
 	(IMapper mapper, UserManager<User> userManager) : 
 	IRequestHandler<RegisterUserCommand, ApiBaseResponse>
 {

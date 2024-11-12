@@ -13,7 +13,7 @@ using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
 using Inno_Shop.Services.ProductAPI.Core.Application.Queries;
 using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 
-namespace Inno_Shop.Services.ProductAPI.Tests;
+namespace Inno_Shop.Services.ProductAPI.Tests.Handlers;
 
 public class GetProductHandlerTests
 {

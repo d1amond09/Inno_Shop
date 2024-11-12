@@ -12,7 +12,7 @@ using Inno_Shop.Services.ProductAPI.Core.Application.Commands;
 using Inno_Shop.Services.ProductAPI.Core.Domain.Responses;
 using Inno_Shop.Services.ProductAPI.Presentation.Extensions;
 
-namespace Inno_Shop.Services.ProductAPI.Tests;
+namespace Inno_Shop.Services.ProductAPI.Tests.Handlers;
 
 public class CreateProductHandlerTests
 {

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Inno_Shop.Services.UserAPI.Core.Application.Handlers;
 
-internal sealed class DeleteUserHandler(UserManager<User> userManager) : 
+public sealed class DeleteUserHandler(UserManager<User> userManager) : 
 	IRequestHandler<DeleteUserCommand, ApiBaseResponse>
 {
     private readonly UserManager<User> _userManager = userManager;

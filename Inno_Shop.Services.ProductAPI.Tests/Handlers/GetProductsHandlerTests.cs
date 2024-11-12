@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Inno_Shop.Services.ProductAPI.Core.Domain.LinkModels;
 using Inno_Shop.Services.ProductAPI.Core.Domain.Models;
 
-namespace Inno_Shop.Services.ProductAPI.Tests;
+namespace Inno_Shop.Services.ProductAPI.Tests.Handlers;
 
 public class GetProductsHandlerTests
 {

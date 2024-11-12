@@ -11,7 +11,7 @@ using Inno_Shop.Services.ProductAPI.Core.Domain.Responses;
 using Inno_Shop.Services.ProductAPI.Domain.DataTransferObjects;
 using Inno_Shop.Services.ProductAPI.Domain.Models;
 
-namespace Inno_Shop.Services.ProductAPI.Tests;
+namespace Inno_Shop.Services.ProductAPI.Tests.Handlers;
 
 public class UpdateProductHandlerTests
 {
