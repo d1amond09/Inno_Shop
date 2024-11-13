@@ -20,6 +20,7 @@ public sealed class CreateProductHandler(IProductRepository rep, IMapper mapper)
 
         var productToCreate = _mapper.Map<Product>(request.Product);
         productToCreate.UserID = userId;
+        productToCreate.CreationDate = DateTime.Now;
 
         _rep.CreateProduct(productToCreate);
 		await _rep.SaveAsync();

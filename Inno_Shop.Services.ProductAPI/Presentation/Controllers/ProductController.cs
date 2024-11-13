@@ -92,7 +92,7 @@ public class ProductController(ISender sender) : ApiControllerBase
 
 		var createdProduct = baseResult.GetResult<ProductDto>();
 
-        return CreatedAtRoute("ProductById", new { id = createdProduct.ProductID }, createdProduct);
+        return CreatedAtRoute("GetProduct", new { id = createdProduct.ProductID }, createdProduct);
 	}
 
     [Authorize]
