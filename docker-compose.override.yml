@@ -1,0 +1,31 @@
+services:
+  inno_shop.services.userapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=443
+      - DB_HOST=innoshopdb
+      - DB_NAME=InnoShopDB_Identity
+      - DB_SA_PASSWORD=Pa55w@rd2022
+      - ConnectionStrings__DefaultConnection=Server=innoshopdb;Database=InnoShopDB_Identity;User Id=SA;Password=NewPa55w@rd2022;TrustServerCertificate=True;
+    ports:
+      - "8080"
+      - "443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+  inno_shop.services.productapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8082
+      - ASPNETCORE_HTTPS_PORTS=444
+      - DB_HOST=innoshopdb
+      - DB_NAME=InnoShopDB_Identity
+      - DB_SA_PASSWORD=Pa55w@rd2022
+      - ConnectionStrings__DefaultConnection=Server=innoshopdb;Database=InnoShopDB;User Id=SA;Password=NewPa55w@rd2022;TrustServerCertificate=True;
+    ports:
+      - "8082"
+      - "444"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
