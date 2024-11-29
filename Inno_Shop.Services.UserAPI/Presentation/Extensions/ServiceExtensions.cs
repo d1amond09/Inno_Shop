@@ -30,10 +30,12 @@ public static class ServiceExtensions
     public static void ConfigureCors(this IServiceCollection services) =>
         services.AddCors(options =>
         {
-            options.AddPolicy("CorsPolicy", builder =>
-            builder.AllowAnyOrigin()
+            options.AddPolicy("CorsPolicy", 
+                builder =>
+            builder.WithOrigins("http://localhost:5173", "https://localhost:8007")
             .AllowAnyMethod()
-            .AllowAnyHeader());
+            .AllowAnyHeader()
+            .AllowCredentials());
         });
 
     public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration) =>
@@ -129,7 +131,7 @@ public static class ServiceExtensions
         List<RateLimitRule> rateLimitRules = [
             new() {
                 Endpoint = "*",
-                Limit = 10,
+                Limit = 50,
                 Period = "1s"
             }
         ];

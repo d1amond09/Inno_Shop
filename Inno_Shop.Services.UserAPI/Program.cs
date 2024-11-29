@@ -29,16 +29,18 @@ public class Program
             });
         }
 
+        ConfigureApp(app);
         app.UseHttpsRedirection();
 
         app.MapControllers();
-
+        
         app.Run();
 	}
 
 	public static void ConfigureServices(IServiceCollection s, IConfiguration config)
 	{
 		s.AddAuthentication();
+		s.ConfigureCors();
 		s.ConfigureIdentity();
 		s.ConfigureJWT(config);
         s.AddJwtConfiguration(config);
@@ -55,6 +57,8 @@ public class Program
         s.ConfigureResponseCaching();
         s.ConfigureHttpCacheHeaders();
         s.AddMemoryCache();
+
+        s.ConfigureRateLimitingOptions();
 
         s.AddEndpointsApiExplorer();
         s.ConfigureSwagger();

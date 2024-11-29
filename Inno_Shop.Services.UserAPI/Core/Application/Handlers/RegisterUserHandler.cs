@@ -25,7 +25,7 @@ public sealed class RegisterUserCommandHandler
 		
 		if (identityResult.Succeeded)
 			await _userManager
-				.AddToRolesAsync(user, request.UserForRegistrationDto.Roles!);
+				.AddToRolesAsync(user, ["User"]);
 
         (IdentityResult, User) result = new (identityResult, user);
 

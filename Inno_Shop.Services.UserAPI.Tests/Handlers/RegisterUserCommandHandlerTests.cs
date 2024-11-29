@@ -76,7 +76,6 @@ public class RegisterUserCommandHandlerTests
         var userForRegistrationDto = new UserForRegistrationDto
         {
             Password = password,
-            Roles = ["User"],
             ConfirmPassword = password,
             Email = ""
         };
