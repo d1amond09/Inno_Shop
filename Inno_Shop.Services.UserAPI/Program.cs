@@ -30,7 +30,6 @@ public class Program
         }
 
         ConfigureApp(app);
-        app.UseHttpsRedirection();
 
         app.MapControllers();
         
@@ -39,10 +38,10 @@ public class Program
 
 	public static void ConfigureServices(IServiceCollection s, IConfiguration config)
 	{
-		s.AddAuthentication();
-		s.ConfigureCors();
+		s.ConfigureCors(config);
+        s.AddAuthentication();
 		s.ConfigureIdentity();
-		s.ConfigureJWT(config);
+        s.ConfigureJWT(config);
         s.AddJwtConfiguration(config);
 
         s.AddProblemDetails();
@@ -70,20 +69,21 @@ public class Program
         {
             options.SuppressModelStateInvalidFilter = true;
         });
+        
 
         s.AddControllers(cnfg =>
-		{
-			cnfg.RespectBrowserAcceptHeader = true;
-            cnfg.ReturnHttpNotAcceptable = true;
-            cnfg.CacheProfiles.Add("120SecondsDuration", new CacheProfile
-            {
-                Duration = 120
-            });
-        }).AddNewtonsoftJson()
-        .AddXmlDataContractSerializerFormatters();
+        {
+	        cnfg.RespectBrowserAcceptHeader = true;
+	        cnfg.ReturnHttpNotAcceptable = true;
+	        cnfg.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+	        {
+		        Duration = 120
+	        });
+        }).AddNewtonsoftJson();
 
         s.AddCustomMediaTypes();
         s.ConfigureEmailSending(config);
+        s.AddAuthorization();
     }
 
 	public static void ConfigureApp(IApplicationBuilder app)
@@ -102,5 +102,5 @@ public class Program
 		app.UseRouting();
 		app.UseAuthentication();
 		app.UseAuthorization();
-    }
+	}
 }

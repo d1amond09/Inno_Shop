@@ -26,18 +26,20 @@ public class GetUsersHandler
         GetUsersQuery request, 
         CancellationToken cancellationToken)
     {
-        var users = await _userManager.Users
-            .Sort(request.LinkParameters.UserParameters.OrderBy)
+        var users = _userManager.Users
+            .Search(request.LinkParameters.UserParameters.SearchTerm)    
+            .Sort(request.LinkParameters.UserParameters.OrderBy);
+            
+        var count = await users.CountAsync(cancellationToken);
+            
+        var usersToReturn = await users
             .Skip((request.LinkParameters.UserParameters.PageNumber - 1) *
                    request.LinkParameters.UserParameters.PageSize)
             .Take(request.LinkParameters.UserParameters.PageSize)
             .ToListAsync(cancellationToken);
-
-
-        var count = await _userManager.Users.CountAsync(cancellationToken);
-
+        
         var usersWithMetaData = new PagedList<User>(
-            users, count,
+            usersToReturn, count,
             request.LinkParameters.UserParameters.PageNumber,
             request.LinkParameters.UserParameters.PageSize
         );
@@ -46,7 +48,7 @@ public class GetUsersHandler
 
         for(int i = 0; i < usersDto.Count(); i++)
         {
-            usersDto.ElementAt(i).Roles = await _userManager.GetRolesAsync(users[i]);
+            usersDto.ElementAt(i).Roles = await _userManager.GetRolesAsync(usersToReturn[i]);
         }
 
         var links = _userLinks.TryGenerateLinks(

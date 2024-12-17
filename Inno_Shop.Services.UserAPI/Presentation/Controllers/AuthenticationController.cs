@@ -13,16 +13,12 @@ namespace Inno_Shop.Services.UserAPI.Presentation.Controllers;
 [Consumes("application/json")]
 [Route("api/authentication")]
 [ApiController]
-public class AuthenticationController(ISender sender, UserManager<User> userManager, IEmailSender emailSender) : ApiControllerBase
+public class AuthenticationController(ISender sender, UserManager<User> userManager, IEmailSender emailSender, IConfiguration config) : ApiControllerBase
 {
-	private readonly ISender _sender = sender;
-	private readonly UserManager<User> _userManager = userManager;
-	private readonly IEmailSender _emailSender = emailSender;
-
 	[HttpPost(Name = "SignUp")]
     public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
 	{
-        var baseResult = await _sender.Send(new RegisterUserCommand(userForRegistration));
+        var baseResult = await sender.Send(new RegisterUserCommand(userForRegistration));
 
         if (!baseResult.Success)
             return ProcessError(baseResult);
@@ -38,10 +34,11 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
 			return BadRequest(ModelState);
 		}
 
-        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var confirmationLink = Url.Action(nameof(ConfirmEmail), "Authentication", new { token, email = user.Email }, Request.Scheme);
-        var message = new Message([user.Email!], "Confirmation email link", confirmationLink!, null);
-        await _emailSender.SendEmailAsync(message);
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var frontendUrl = config["Frontend:Default"];
+        string callback = $"{frontendUrl}/confirm-email?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email)}";
+        var message = new Message([user.Email!], "Confirmation email link", callback, null);
+        await emailSender.SendEmailAsync(message);
 
         return StatusCode(201);
 	}
@@ -49,7 +46,7 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
 	[HttpPost("login", Name = "SignIn")]
     public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto userForAuth)
 	{
-		var baseResult = await _sender.Send(new ValidateUserCommand(userForAuth));
+		var baseResult = await sender.Send(new ValidateUserCommand(userForAuth));
 
         if (!baseResult.Success)
             return ProcessError(baseResult);
@@ -59,12 +56,12 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
         if (!isValidUser)
 			return Unauthorized("Invalid username or password.");
 
-		var user = await _userManager.FindByNameAsync(userForAuth.UserName!);
+		var user = await userManager.FindByNameAsync(userForAuth.UserName!);
 
 		if (user == null)
 			return Unauthorized("Invalid username or password.");
 
-		var tokenDtoBaseResult = await _sender.Send(new CreateTokenCommand(user, PopulateExp: true));
+		var tokenDtoBaseResult = await sender.Send(new CreateTokenCommand(user, PopulateExp: true));
 
         if (!tokenDtoBaseResult.Success)
             return ProcessError(tokenDtoBaseResult);
@@ -77,11 +74,11 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
     [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmail(string token, string email)
     {
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await userManager.FindByEmailAsync(email);
         if (user == null)
             return NotFound();
 
-        var result = await _userManager.ConfirmEmailAsync(user, token);
+        var result = await userManager.ConfirmEmailAsync(user, token);
 
         if (!result.Succeeded)
         {
@@ -100,20 +97,22 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
     {
         if (!ModelState.IsValid)
             return BadRequest(forgotPasswordModel);
-        
-        var user = await _userManager.FindByEmailAsync(forgotPasswordModel.Email!);
-        
+    
+        var user = await userManager.FindByEmailAsync(forgotPasswordModel.Email!);
+    
         if (user == null)
             return NotFound();
+    
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
         
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var frontendUrl = config["Frontend:Default"];
         
-        string callback = Url.Action(nameof(ResetPassword), "Authentication", new { token, email = user.Email }, Request.Scheme)!;
-        
+        string callback = $"{frontendUrl}/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email)}";
+
         Message message = new([user.Email!], "Reset password token", callback, null);
-        
-        await _emailSender.SendEmailAsync(message);
-        
+    
+        await emailSender.SendEmailAsync(message);
+    
         return Ok(new { Message = "Password reset link has been sent to your email." });
     }
 
@@ -132,12 +131,12 @@ public class AuthenticationController(ISender sender, UserManager<User> userMana
         if (!ModelState.IsValid)
             return BadRequest(resetPasswordModel);
 
-        var user = await _userManager.FindByEmailAsync(resetPasswordModel.Email!);
+        var user = await userManager.FindByEmailAsync(resetPasswordModel.Email!);
         
         if (user == null)
             return NotFound();
 
-        var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordModel.Token!, resetPasswordModel.Password!);
+        var resetPassResult = await userManager.ResetPasswordAsync(user, resetPasswordModel.Token!, resetPasswordModel.Password!);
         
         if (!resetPassResult.Succeeded)
         {

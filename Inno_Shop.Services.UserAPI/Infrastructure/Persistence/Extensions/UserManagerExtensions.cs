@@ -6,7 +6,7 @@ namespace Inno_Shop.Services.UserAPI.Infastructure.Persistence.Extensions;
 
 public static class UserManagerExtensions
 {	
-	public static IQueryable<User> Search(this IQueryable<User> users, string searchTerm)
+	public static IQueryable<User> Search(this IQueryable<User> users, string? searchTerm)
 	{
 		if (string.IsNullOrWhiteSpace(searchTerm)) 
 			return users;

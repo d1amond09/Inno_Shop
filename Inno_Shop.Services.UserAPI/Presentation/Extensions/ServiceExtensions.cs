@@ -27,12 +27,12 @@ namespace Inno_Shop.Services.UserAPI.Presentation.Extensions;
 
 public static class ServiceExtensions
 {
-    public static void ConfigureCors(this IServiceCollection services) =>
+    public static void ConfigureCors(this IServiceCollection services, IConfiguration config) =>
         services.AddCors(options =>
         {
             options.AddPolicy("CorsPolicy", 
                 builder =>
-            builder.WithOrigins("http://localhost:5173", "https://localhost:8007")
+            builder.WithOrigins(config["Frontend:Default"], "https://localhost:8007", "https://inno_shop.services.userapi:444")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
@@ -80,34 +80,35 @@ public static class ServiceExtensions
 
     public static void ConfigureExceptionHandler(this IServiceCollection services) =>
         services.AddExceptionHandler<GlobalExceptionHandler>();
-
-    public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
-    {
-        var jwtConfiguration = new JwtConfiguration();
-        configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
-
-        services.AddAuthentication(opt =>
-        {
-            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-
-                ValidIssuer = jwtConfiguration.ValidIssuer,
-                ValidAudience = jwtConfiguration.ValidAudience,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(
-                        configuration.GetValue<string>("SECRET")!
-                ))
-            };
-        });
+    
+    public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration) 
+    { 
+        var jwtConfiguration = new JwtConfiguration(); 
+        configuration.Bind(jwtConfiguration.Section, jwtConfiguration); 
+ 
+        var secretKey = configuration.GetValue<string>("SECRET");
+        ArgumentNullException.ThrowIfNull(secretKey);
+        
+        services.AddAuthentication(opt => 
+            { 
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
+            }) 
+            .AddJwtBearer(options => 
+            { 
+                options.TokenValidationParameters = new TokenValidationParameters 
+                { 
+                    ValidateIssuer = true, 
+                    ValidateAudience = true, 
+                    ValidateLifetime = true, 
+                    ValidateIssuerSigningKey = true, 
+ 
+                    ValidIssuer = jwtConfiguration.ValidIssuer, 
+                    ValidAudience = jwtConfiguration.ValidAudience, 
+                    IssuerSigningKey = new 
+                        SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) 
+                }; 
+            }); 
     }
 
     public static void ConfigureResponseCaching(this IServiceCollection services) =>
@@ -197,15 +198,6 @@ public static class ServiceExtensions
 
             newtonsoftJsonOutputFormatter?.SupportedMediaTypes
                 .Add("application/apiroot+json");
-
-            var xmlOutputFormatter = config.OutputFormatters
-                .OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
-
-            xmlOutputFormatter?.SupportedMediaTypes
-                .Add("application/hateoas+xml");
-
-            xmlOutputFormatter?.SupportedMediaTypes
-                .Add("application/apiroot+xml");
         });
     }
 

@@ -24,7 +24,7 @@ public class UserController(ISender sender, UserManager<User> userManager) : Api
 {
     private readonly ISender _sender = sender;
     private readonly UserManager<User> _userManager = userManager;
-
+    
     [Authorize]
     [HttpGet(Name = "GetUsers")]
     [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
